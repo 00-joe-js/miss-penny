@@ -1,0 +1,11 @@
+{
+    "extends": "@tsconfig/node12/tsconfig.json",
+    "compilerOptions": {
+      "inlineSourceMap": true,
+      "resolveJsonModule": true,
+      "outDir": "dist"
+    },
+    "lib": ["ES2019"],
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "sens"]
+  }
