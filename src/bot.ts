@@ -3,7 +3,7 @@ import type { ChatUserstate } from "tmi.js";
 import { Client } from "tmi.js";
 import { twitchToken, username, channels } from "../sens/creds.json";
 
-import { pickFromAll } from "./misc/random-smash-ultimate-char";
+import smashRandom from "./commands/smashRandom";
 
 const twitchChatBotClient = new Client({
     identity: {
@@ -17,19 +17,31 @@ twitchChatBotClient.on("connected", () => {
     twitchChatBotClient.on("message", handleMessage);
 });
 
-const commands: { [k: string]: () => string } = {
-    "!smashRandom()": () => {
-        return `You should play: ${pickFromAll().name}!`;
-    }
+const commands: { [k: string]: (opts: any) => string } = {
+    "!smashRandom": smashRandom
+};
+
+const spaces = /\s/gi;
+const parseParameters = (messageText: string) => {
+    messageText = messageText.replace(spaces, "");
+    const openParenPos = messageText.indexOf("(");
+    const closeParenPos = messageText.indexOf(")");
+    const parametersString = messageText.slice(openParenPos + 1, closeParenPos);
+    return parametersString.split(",").reduce((o: { [key: string]: string }, s) => {
+        const [key, value] = s.split("=");
+        o[key] = value;
+        return o;
+    }, {});
 };
 
 const parseMessageToCommand = (messageText: string): Function | null => {
     if (messageText[0] !== "!") return null;
-    const firstPart = messageText.split(" ")[0];
+    const firstPart = messageText.split("(")[0];
     if (!commands[firstPart]) {
         return null;
     } else {
-        return commands[firstPart];
+        const parameters = parseParameters(messageText);
+        return commands[firstPart].bind(null, parameters);
     }
 };
 
