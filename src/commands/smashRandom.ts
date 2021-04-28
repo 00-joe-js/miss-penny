@@ -2,6 +2,7 @@ interface SmashRandomOptions {
     fighterPack1: string,
     fighterPack2: string,
     length: string,
+    oos: string,
 }
 
 interface SmashCharacter {
@@ -17,7 +18,8 @@ const toBool = (s: string): boolean => {
     return s === "false" ? false : true;
 }
 
-export default ({ fighterPack1 = "true", fighterPack2 = "true", length = "1" }: SmashRandomOptions) => {
+export default ({ fighterPack1 = "true", fighterPack2 = "true", length = "1", oos = "false" }: SmashRandomOptions) => {
+    const allOs = toBool(oos);
     const includeFighterPack1 = toBool(fighterPack1);
     const includeFighterPack2 = toBool(fighterPack2);
     const lengthNumber = Math.min(parseInt(length, 10), 7);
@@ -31,5 +33,13 @@ export default ({ fighterPack1 = "true", fighterPack2 = "true", length = "1" }: 
         pickedFighters.push(possibleFighter);
     }
 
-    return `You should play: ${pickedFighters.map(f => f.name).join(" || ")}!`;
+    let fighterNames = pickedFighters.map(f => f.name);
+
+    if (allOs) {
+        fighterNames = fighterNames.map(name => {
+            return name.replace(/[AEIOU]/gi, "O");
+        });
+    }
+
+    return `You should play: ${fighterNames.join(" || ")}!`;
 }
