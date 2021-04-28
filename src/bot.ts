@@ -11,6 +11,10 @@ const commands: { [k: string]: (opts: any, userState: ChatUserstate) => void } =
         const selection = smashRandom(opts);
         twitchChatBotClient.say(channels[0], `${userState.username} ${selection}`);
     },
+    "!sr5": (opts, userState) => {
+        const selection = smashRandom({length: "5", fighterPack2: "true", fighterPack1: "true"});
+        twitchChatBotClient.say(channels[0], `${userState.username} ${selection}`);
+    },
     "!arena": (opts, userState) => {
         const message = shareArena();
         if (userState.username) {
