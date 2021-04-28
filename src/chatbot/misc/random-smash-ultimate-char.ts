@@ -1,4 +1,4 @@
-import characters from "../../sens/smashUltimateChars.json";
+import characters from "../../../sens/smashUltimateChars.json";
 
 import chance from "chance";
 const c = chance.Chance();

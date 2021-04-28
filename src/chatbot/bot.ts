@@ -1,7 +1,7 @@
 import { ChatUserstate, client } from "tmi.js";
 
 import { Client } from "tmi.js";
-import { twitchToken, username, channels } from "../sens/creds.json";
+import { twitchToken, username, channels } from "../../sens/creds.json";
 
 import smashRandom from "./commands/smashRandom";
 import shareArena from "./commands/shareArena";
