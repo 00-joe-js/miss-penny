@@ -9,7 +9,7 @@ import shareArena from "./commands/shareArena";
 const commands: { [k: string]: (opts: any, userState: ChatUserstate) => void } = {
     "!smashRandom": (opts, userState) => {
         const selection = smashRandom(opts);
-        twitchChatBotClient.say(channels[0], selection);
+        twitchChatBotClient.say(channels[0], `${userState.username} ${selection}`);
     },
     "!arena": (opts, userState) => {
         const message = shareArena();
