@@ -23,7 +23,7 @@ if (NODE_ENV === "production") {
 
     const server = https.createServer(sslOptions);
     server.on("request", app);
-    server.listen(PORT, () => {
+    server.listen(PORT, SERVER_HOSTNAME, () => {
         console.log(`Listening on ${PORT}`);
     });
 
