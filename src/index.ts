@@ -15,6 +15,7 @@ if (NODE_ENV === "production") {
     if (!SSL_DIR) throw new Error("No SSL directory specified.");
 
     const getSSLPath = (path: string) => join(SSL_DIR, path);
+    console.log(readFileSync(getSSLPath(SSL_KEY)));
     const sslOptions = {
         cert: readFileSync(getSSLPath(SSL_CERT)),
         ca: readFileSync(getSSLPath(SSL_BUNDLE)),
@@ -23,7 +24,9 @@ if (NODE_ENV === "production") {
 
     const server = https.createServer(sslOptions);
     server.on("request", app);
-    server.listen(PORT, SERVER_HOSTNAME);
+    server.listen(PORT, () => {
+        console.log(`Listening on ${PORT}`);
+    });
 
     establishSSLVerificationRoutes(app);
 } else {
