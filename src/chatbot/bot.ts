@@ -3,6 +3,7 @@ import { ChatUserstate, client } from "tmi.js";
 import { Client } from "tmi.js";
 import { twitchToken, username, channels } from "../../sens/creds.json";
 
+import joesWorkingOn from "./commands/joesWorkingOn";
 import smashRandom from "./commands/smashRandom";
 import shareArena from "./commands/shareArena";
 
@@ -19,8 +20,12 @@ const commands: { [k: string]: (opts: any, userState: ChatUserstate) => void } =
         const message = shareArena();
         if (userState.username) {
             // TODO: get bot account verified with twitch in order to whisper
-            twitchChatBotClient.say(userState.username, message);
+            twitchChatBotClient.say(channels[0], message);
         }
+    },
+    "!joesWorkingOn": (opts, userState) => {
+        const message = joesWorkingOn();
+        twitchChatBotClient.say(channels[0], message);
     }
 };
 
