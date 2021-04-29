@@ -21,11 +21,8 @@ if (NODE_ENV === "production") {
         key: readFileSync(getSSLPath(SSL_KEY))
     };
 
-    const server = https.createServer(sslOptions, (req, res) => {
-        console.log("request heard");
-        res.write("oh");
-        res.end();
-    });
+    const server = https.createServer(sslOptions);
+    server.on("request", app);
     server.listen(PORT, () => {
         console.log(`Listening on ${PORT}`);
     });
