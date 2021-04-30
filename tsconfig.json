@@ -3,9 +3,11 @@
     "compilerOptions": {
       "inlineSourceMap": true,
       "resolveJsonModule": true,
-      "outDir": "dist"
+      "outDir": "dist",
+      "jsx": "react",
+      "lib": ["DOM"]
     },
     "lib": ["ES2019"],
     "include": ["src/**/*"],
-    "exclude": ["node_modules", "sens"]
+    "exclude": ["node_modules", "sens"],
   }

@@ -14,27 +14,16 @@ if (NODE_ENV === "development") {
     // Prod.
 }
 
-app.get("/", (req, res) => {
-    if (req.session.twitchUsername) {
-        res.send(`Hi ${req.session.twitchUsername}`);
-    } else {
-        res.redirect("/testing-oauth-flow");
-    }
-});
-
-import { resolve } from "path";
-app.get("/testing-oauth-flow", (_, res) => {
-    res.sendFile(resolve("./src/oauth-test/index.html"));
-});
-
 import { clientSecret, clientId, redirectUri } from "../sens/creds.json";
 import fetch from "node-fetch";
 
 declare module 'express-session' {
     interface SessionData {
-      twitchUsername: string;
+        twitchUsername: string;
     }
-  }
+}
+
+app.get("/pop", (_, res) => res.json([3]));
 
 app.get("/biscuit", async (req, res, next) => {
 
@@ -71,5 +60,4 @@ app.get("/biscuit", async (req, res, next) => {
 });
 
 import startServer from "./startServer";
-import { POINT_CONVERSION_COMPRESSED } from "node:constants";
 startServer(app);
