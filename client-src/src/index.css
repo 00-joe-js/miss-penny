@@ -48,6 +48,7 @@ nav h1 {
 nav img {
   width: 5rem;
   cursor: pointer;
+  opacity: 0.7;
 }
 
 #glitch-canvas {

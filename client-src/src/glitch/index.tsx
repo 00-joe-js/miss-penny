@@ -6,21 +6,20 @@ const colorThemes = [
     ["#000", "#fff"],
     ["red", "green", "blue"],
     ["#777", "blue"],
-    ["#e619b2", "#0cf3b5", "#ff2e00", "#8ded12", "#0a0e7d", "#aaaba8", "#ff1d00"]
+    ["#e619b2", "#0cf3b5", "#ff2e00", "#8ded12", "#0a0e7d", "#aaaba8", "#ff1d00"],
+    ["#e52165", "#0d1137"],
+    ["#e2d810", "#d9138a", "#12a4d9", "#322e2f"],
+    ["#f3ca20", "#000"]
 ];
 
 const glitchAway = (canvasElement: HTMLCanvasElement) => {
 
     let drawFrames = true;
     let lastDrawTimestamp = Date.now();
-    const maxFrameRate = 1000 / c.integer({ min: 5, max: 30 });
+
     const turnOff = () => {
         drawFrames = false;
     };
-
-    const whiteLines = c.bool();
-    const lineRate = c.floating({min: 0.1, max: 0.9});
-    const randomColors = colorThemes[c.integer({ min: 0, max: colorThemes.length - 1 })];
 
     const width = canvasElement.clientWidth;
     const height = canvasElement.clientHeight;
@@ -29,9 +28,23 @@ const glitchAway = (canvasElement: HTMLCanvasElement) => {
     canvasElement.height = height;
     const ctx = canvasElement.getContext("2d");
     if (!ctx) throw new Error("No context?");
-    const squareWidth = width / 300;
-    const squareHeight = squareWidth;
-    // For drawing:
+
+
+    const maxFrameRate = 1000 / c.integer({ min: 5, max: 30 });
+    const squaresPerLine = c.integer({ min: 100, max: 300 });
+    const whiteLines = c.bool();
+    const lineRate = c.floating({ min: 0.1, max: 0.9 });
+    const squareWidth = width / squaresPerLine;
+    const squareHeight = squareWidth * c.floating({ min: 0.5, max: 1.5 });
+
+    const useAColorTheme = c.bool();
+
+    let randomColors: string[] = [];
+    if (useAColorTheme) {
+        randomColors = c.pickone(colorThemes);
+    } else {
+        randomColors = [c.color(), c.color(), c.color(), c.color()];
+    }
 
     const drawRandomGlitchySquares = () => {
         const now = Date.now();
@@ -55,7 +68,6 @@ const glitchAway = (canvasElement: HTMLCanvasElement) => {
                 continue;
             };
             for (let xOffset = 0; xOffset < width; xOffset += squareWidth) {
-
                 ctx.fillStyle = c.pickone(randomColors);
                 ctx.fillRect(xOffset, yOffset, squareWidth, squareHeight);
             }
@@ -66,7 +78,7 @@ const glitchAway = (canvasElement: HTMLCanvasElement) => {
     return turnOff;
 };
 
-const C = () => {
+const GlitchBanner = () => {
 
     const canvasElementRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -83,4 +95,4 @@ const C = () => {
 
 };
 
-export default C;
+export default GlitchBanner;
