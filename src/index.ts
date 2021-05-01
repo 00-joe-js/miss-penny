@@ -23,6 +23,13 @@ declare module 'express-session' {
     }
 }
 
+import {resolve} from "path";
+app.use(express.static(resolve("./client-build")));
+
+app.get("/", (req, res) => {
+    res.sendFile(resolve("./client-build/index.html"));
+});
+
 app.get("/pop", (_, res) => res.json([3]));
 
 app.get("/biscuit", async (req, res, next) => {
