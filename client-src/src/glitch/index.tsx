@@ -1,0 +1,86 @@
+import React, { useEffect, useRef } from "react";
+import chance from "chance";
+const c = chance.Chance();
+
+const colorThemes = [
+    ["#000", "#fff"],
+    ["red", "green", "blue"],
+    ["#777", "blue"],
+    ["#e619b2", "#0cf3b5", "#ff2e00", "#8ded12", "#0a0e7d", "#aaaba8", "#ff1d00"]
+];
+
+const glitchAway = (canvasElement: HTMLCanvasElement) => {
+
+    let drawFrames = true;
+    let lastDrawTimestamp = Date.now();
+    const maxFrameRate = 1000 / c.integer({ min: 5, max: 30 });
+    const turnOff = () => {
+        drawFrames = false;
+    };
+
+    const whiteLines = c.bool();
+    const lineRate = c.floating({min: 0.1, max: 0.9});
+    const randomColors = colorThemes[c.integer({ min: 0, max: colorThemes.length - 1 })];
+
+    const width = canvasElement.clientWidth;
+    const height = canvasElement.clientHeight;
+
+    canvasElement.width = width;
+    canvasElement.height = height;
+    const ctx = canvasElement.getContext("2d");
+    if (!ctx) throw new Error("No context?");
+    const squareWidth = width / 300;
+    const squareHeight = squareWidth;
+    // For drawing:
+
+    const drawRandomGlitchySquares = () => {
+        const now = Date.now();
+        const timeSince = now - lastDrawTimestamp;
+
+        if (timeSince < maxFrameRate) {
+            window.requestAnimationFrame(drawRandomGlitchySquares);
+            return;
+        }
+        if (drawFrames === false) return;
+
+        lastDrawTimestamp = now;
+
+
+        for (let yOffset = 0; yOffset < height; yOffset += squareHeight) {
+            if (Math.random() > lineRate) {
+                if (whiteLines) {
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(0, yOffset, width, height);
+                }
+                continue;
+            };
+            for (let xOffset = 0; xOffset < width; xOffset += squareWidth) {
+
+                ctx.fillStyle = c.pickone(randomColors);
+                ctx.fillRect(xOffset, yOffset, squareWidth, squareHeight);
+            }
+        }
+        window.requestAnimationFrame(drawRandomGlitchySquares);
+    };
+    drawRandomGlitchySquares();
+    return turnOff;
+};
+
+const C = () => {
+
+    const canvasElementRef = useRef<HTMLCanvasElement | null>(null);
+
+    useEffect(() => {
+        if (canvasElementRef.current === null) return;
+        const actuallyStop = glitchAway(canvasElementRef.current);
+        return () => actuallyStop();
+    }, []);
+
+
+    return (
+        <canvas id="glitch-canvas" ref={canvasElementRef}></canvas>
+    );
+
+};
+
+export default C;
