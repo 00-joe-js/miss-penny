@@ -2,3 +2,4 @@ sens/
 dist/
 node_modules/
 .vscode
+client-build/
