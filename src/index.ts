@@ -11,7 +11,7 @@ if (NODE_ENV === "development") {
         cookie: { secure: false }
     }));
 } else {
-    // Prod.
+    // TODO: set up prod session strategy -- DO NOT USE INMEMORY (redis)
 }
 
 import { clientSecret, clientId, redirectUri } from "../sens/creds.json";
@@ -23,16 +23,28 @@ declare module 'express-session' {
     }
 }
 
-import {resolve} from "path";
+import { resolve } from "path";
 app.use(express.static(resolve("./client-build")));
 
 app.get("/", (req, res) => {
     res.sendFile(resolve("./client-build/index.html"));
 });
 
+app.get("/twitch-user", (req, res) => {
+    if (req.session.twitchUsername) {
+        // TODO: think about other important auth info?
+        res.json({ twitchUsername: req.session.twitchUsername });
+    } else {
+        res.json({ twitchUsername: null });
+    }
+});
+
 app.get("/pop", (_, res) => res.json([3]));
 
 app.get("/biscuit", async (req, res, next) => {
+
+    // TODO: Check session info for existing valid Twitch user info
+    // TODO: Implement refresh token here..ish
 
     if (!req.query.code) return next(new Error("Missing code from Twitch redirect"));
 
@@ -62,7 +74,8 @@ app.get("/biscuit", async (req, res, next) => {
 
     req.session.twitchUsername = twitchUsername;
 
-    res.redirect("/");
+    // TODO: env this front-end URL!!!
+    res.redirect("http://localhost:3000/"); // This client will ask for Twitch user info
 
 });
 

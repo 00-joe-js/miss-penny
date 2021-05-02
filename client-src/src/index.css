@@ -65,12 +65,4 @@ nav img {
 main {
   background:rgb(255, 138, 144);
   flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-main img {
-  width: 150px;
-  margin-top: -25%;
 }

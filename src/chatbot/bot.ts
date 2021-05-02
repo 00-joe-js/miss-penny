@@ -7,26 +7,33 @@ import joesWorkingOn from "./commands/joesWorkingOn";
 import smashRandom from "./commands/smashRandom";
 import shareArena from "./commands/shareArena";
 
+const pennySay = (msg: string) => {
+    twitchChatBotClient.say(channels[0], `joejsBbpenny ${msg}`);
+};
+
 const commands: { [k: string]: (opts: any, userState: ChatUserstate) => void } = {
     "!smashRandom": (opts, userState) => {
         const selection = smashRandom(opts);
-        twitchChatBotClient.say(channels[0], `${userState.username} ${selection}`);
+        pennySay(`${userState.username} ${selection}`);
     },
     "!sr5": (opts, userState) => {
-        const selection = smashRandom({length: "5", fighterPack2: "true", fighterPack1: "true", oos: "true"});
-        twitchChatBotClient.say(channels[0], `${userState.username} ${selection}`);
+        const selection = smashRandom({ length: "5", fighterPack2: "true", fighterPack1: "true", oos: "true" });
+        pennySay(`${userState.username} ${selection}`);
     },
     "!arena": (opts, userState) => {
         const message = shareArena();
         if (userState.username) {
             // TODO: get bot account verified with twitch in order to whisper
-            twitchChatBotClient.say(channels[0], message);
+            pennySay(message);
         }
     },
     "!joesWorkingOn": (opts, userState) => {
         const message = joesWorkingOn();
-        twitchChatBotClient.say(channels[0], message);
-    }
+        pennySay(message);
+    },
+    "!links": (opts, userState) => {
+        pennySay(`Hi~ :::: https://github.com/00-joe-js/how-to-file-upload :::: https://joejs.live`);
+    },
 };
 
 const spaces = /\s/gi;

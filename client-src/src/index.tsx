@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 import GlitchCanvas from "./glitch/index";
+import SmashPreferencesInterface from "./smashPreferences";
 
 const Root = () => {
   const [glitchKey, setGlitchKey] = useState(Math.random());
@@ -14,7 +15,7 @@ const Root = () => {
         <img src="prof.jpg" onClick={() => setGlitchKey(Math.random())} />
       </nav>
       <main>
-        <img src="https://i.pinimg.com/originals/eb/1b/27/eb1b27863813653543914d222ceb9cd0.gif" />
+        <SmashPreferencesInterface />
       </main>
     </React.StrictMode>
   );
