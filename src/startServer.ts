@@ -2,9 +2,20 @@ import { NODE_ENV, PORT, SSL_DIR, SSL_BUNDLE, SSL_CERT, SSL_KEY, SERVER_HOSTNAME
 import establishSSLVerificationRoutes from "./sslVerification/index";
 import { readFileSync } from "fs";
 import { join } from "path";
+import http from "http";
 import https from "https";
 
 import type { Express } from "express";
+
+const setUpHTTPRedirectionServer = () => {
+    const server = http.createServer((req, res) => {
+        res.writeHead(308, {
+            Location: `https://joejs.live/${req.url}`
+        });
+        res.end();
+    });
+    server.listen(80, () => console.log("Redirection server on 80."));
+};
 
 export default (app: Express) => {
     if (NODE_ENV === "production") {
@@ -25,7 +36,9 @@ export default (app: Express) => {
         });
 
         establishSSLVerificationRoutes(app);
+        setUpHTTPRedirectionServer();
     } else {
+        // Let Express set up the normal HTTP server.
         app.listen(PORT, () => console.log(`Here for you on ${PORT}`));
     }
 
