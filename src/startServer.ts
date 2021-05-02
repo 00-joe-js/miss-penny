@@ -10,7 +10,7 @@ import type { Express } from "express";
 const setUpHTTPRedirectionServer = () => {
     const server = http.createServer((req, res) => {
         res.writeHead(308, {
-            Location: `https://joejs.live/${req.url}`
+            Location: `https://joejs.live${req.url}`
         });
         res.end();
     });
