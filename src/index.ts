@@ -58,8 +58,6 @@ app.get("/twitch-user", async (req, res, next) => {
 
 app.get("/biscuit", async (req, res, next) => {
 
-    // TODO: Implement refresh token here..ish
-
     if (!req.query.code) return next(new Error("Missing code from Twitch redirect"));
 
     const followUpUrl = `https://id.twitch.tv/oauth2/token
