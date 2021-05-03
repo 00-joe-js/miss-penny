@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 
 const twitchFirstStopURL = `https://id.twitch.tv/oauth2/authorize\
 ?client_id=quwrspx68engp5hv7b8ush3vn00zej\
@@ -8,8 +8,8 @@ const twitchFirstStopURL = `https://id.twitch.tv/oauth2/authorize\
 export const askForTwitchUserInfo = async () => {
     // TODO: centralize this URL knowledge
     const res = await fetch("/twitch-user");
-    const data = await res.json();
-    return data.twitchUsername;
+    const data: { twitchUsername: string | null, whitelist: string[] | undefined, blacklist: string[] | undefined } = await res.json();
+    return data;
 };
 
 const TwitchAuth = () => {

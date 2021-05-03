@@ -3,3 +3,4 @@ dist/
 node_modules/
 .vscode
 client-build/
+client-src/src/smashPreferences/characters.json

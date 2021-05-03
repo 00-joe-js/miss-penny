@@ -39,10 +39,12 @@ nav a {
 
 nav h1 {
   font-size: 2rem;
-  padding: 0.25rem;
+  padding: 0.25rem 0.5rem;
   color: white;
   background: rgba(0, 0, 0, 0.7);
   font-weight: 400;
+  border: 1px rgba(255, 255, 255, 0.37);
+  border-style: solid;
 }
 
 nav img {
@@ -65,4 +67,62 @@ nav img {
 main {
   background:rgb(255, 138, 144);
   flex-grow: 1;
+}
+
+#smash-prefs-interface {
+  padding: 0 1rem;
+}
+
+.smash-character-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #530b4d;
+  height: 50px;
+  width: 300px;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+.smash-character-display > div {
+  display: flex;
+  align-items: center;
+}
+.smash-character-display img {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  top: 1px;
+  margin-right: .5rem;
+}
+.smash-character-display h1 {
+  margin: 0;
+  font-family: monospace;
+  font-size: 1.2rem;
+  color: rgb(255, 255, 255);
+}
+
+.list-selections > * {
+  margin-right: 0.1rem;
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.list-selections > *:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.character-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+#random-explain h2 {
+  font-weight: 400;
+}
+#random-explain h2 span {
+  font-weight: 700;
 }
