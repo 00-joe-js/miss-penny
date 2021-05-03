@@ -48,7 +48,7 @@ const CharacterDisplay = (
     return (
         <div className="smash-character-display" style={styleObj}>
             <div>
-                <img src={getCharIconUrl(character)} />
+                <img alt={character.name} src={getCharIconUrl(character)} />
                 <h1 style={{ textDecoration: blacklisted ? "line-through" : "none" }}>{character.name}</h1>
             </div>
             <div className="list-selections">

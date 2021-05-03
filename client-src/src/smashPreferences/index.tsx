@@ -52,7 +52,6 @@ const SmashPreferences = () => {
 
         const createAffectList = (isWhitelist: boolean = true) => {
             const primary = isWhitelist ? "whitelist" : "blacklist";
-            const secondary = isWhitelist ? "blacklist" : "whitelist";
 
             return async (characterId: string) => {
 

@@ -4,7 +4,7 @@ const app = express();
 
 import client, { getUserPrefs, setUserPrefs, updatePrefs } from "./redis";
 
-import { NODE_ENV, SESSION_SECRET } from "../sens/env.json";
+import { NODE_ENV, SESSION_SECRET, FRONT_END_URL } from "../sens/env.json";
 
 import make from "connect-redis";
 const RedisStore = make(session);
@@ -85,8 +85,7 @@ app.get("/biscuit", async (req, res, next) => {
     const twitchUsername = userData.data[0].login;
     req.session.twitchUsername = twitchUsername;
 
-    // TODO: env this front-end URL!!!
-    res.redirect("http://localhost:3000/"); // This client will ask for Twitch user info
+    res.redirect(FRONT_END_URL); // This client will ask for Twitch user info
 
 });
 

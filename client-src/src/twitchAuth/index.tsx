@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 const twitchFirstStopURL = `https://id.twitch.tv/oauth2/authorize\
 ?client_id=quwrspx68engp5hv7b8ush3vn00zej\
