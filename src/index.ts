@@ -36,6 +36,11 @@ declare module 'express-session' {
 }
 
 import { resolve } from "path";
+app.use((req, res, next) => {
+    console.log(req.url);
+    next();
+});
+app.get("/favicon.png", (req, res) => res.sendFile(resolve('./favicon.png')));
 app.use(express.static(resolve("./client-build")));
 app.use("/assets/characterIcons/", express.static(resolve("./sens/icons")));
 
