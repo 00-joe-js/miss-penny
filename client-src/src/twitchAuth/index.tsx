@@ -2,7 +2,7 @@ import React from "react";
 
 const twitchFirstStopURL = `https://id.twitch.tv/oauth2/authorize\
 ?client_id=quwrspx68engp5hv7b8ush3vn00zej\
-&redirect_uri=http://localhost:7777/biscuit\
+&redirect_uri=${location.origin}/biscuit\
 &response_type=code`;
 
 export const askForTwitchUserInfo = async () => {
