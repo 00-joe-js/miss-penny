@@ -35,6 +35,10 @@ const Explain = ({ twitchUsername }: { twitchUsername: string }) => {
     return (
         <div id="random-explain">
             <h2>Hi, <span>{twitchUsername}!</span></h2>
+            <a href="" onClick={(e) => {
+                e.preventDefault();
+                fetch("/twitch-user-logout").then(() => window.location.reload());
+            }}>Logout</a>
         </div>
     );
 };

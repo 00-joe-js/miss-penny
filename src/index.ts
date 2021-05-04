@@ -53,11 +53,10 @@ app.get("/twitch-user", async (req, res, next) => {
         next(e);
     }
 });
-app.get("/twitch-user-logout", (req, res, next) => {
+app.get("/twitch-user-logout", (req, res) => {
     req.session.destroy(() => {
-
-    });
-    res.redirect("");
+        res.redirect(FRONT_END_URL);
+    });   
 });
 
 app.get("/biscuit", async (req, res, next) => {

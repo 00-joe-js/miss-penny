@@ -120,8 +120,13 @@ main {
   justify-content: space-evenly;
 }
 
+#random-explain {
+  display: flex;
+  align-items: center;
+}
 #random-explain h2 {
   font-weight: 400;
+  margin-right: 1rem;
 }
 #random-explain h2 span {
   font-weight: 700;
