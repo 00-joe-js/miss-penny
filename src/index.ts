@@ -6,6 +6,21 @@ import client, { getUserPrefs, setUserPrefs, updatePrefs } from "./redis";
 
 import { NODE_ENV, SESSION_SECRET, FRONT_END_URL } from "../sens/env.json";
 
+import { clientSecret, clientId, redirectUri } from "../sens/creds.json";
+import fetch from "node-fetch";
+
+declare module 'express-session' {
+    interface SessionData {
+        twitchUsername: string;
+    }
+}
+
+import { resolve } from "path";
+app.get("/favicon.png", (_, res) => res.sendFile(resolve('./favicon.png')));
+app.use(express.static(resolve("./client-build")));
+app.use("/assets/characterIcons/", express.static(resolve("./sens/icons")));
+app.get("/", (_, res) => res.sendFile(resolve("./client-build/index.html")));
+
 import make from "connect-redis";
 const RedisStore = make(session);
 if (NODE_ENV === "development") {
@@ -26,28 +41,6 @@ if (NODE_ENV === "development") {
     }));
 }
 
-import { clientSecret, clientId, redirectUri } from "../sens/creds.json";
-import fetch from "node-fetch";
-
-declare module 'express-session' {
-    interface SessionData {
-        twitchUsername: string;
-    }
-}
-
-import { resolve } from "path";
-app.use((req, res, next) => {
-    console.log(req.url);
-    next();
-});
-app.get("/favicon.png", (req, res) => res.sendFile(resolve('./favicon.png')));
-app.use(express.static(resolve("./client-build")));
-app.use("/assets/characterIcons/", express.static(resolve("./sens/icons")));
-
-app.get("/", (req, res) => {
-    res.sendFile(resolve("./client-build/index.html"));
-});
-
 app.get("/twitch-user", async (req, res, next) => {
     try {
         if (req.session.twitchUsername) {
@@ -59,6 +52,12 @@ app.get("/twitch-user", async (req, res, next) => {
     } catch (e) {
         next(e);
     }
+});
+app.get("/twitch-user-logout", (req, res, next) => {
+    req.session.destroy(() => {
+
+    });
+    res.redirect("");
 });
 
 app.get("/biscuit", async (req, res, next) => {
