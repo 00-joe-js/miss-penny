@@ -12,12 +12,19 @@ const pennySay = (msg: string) => {
 };
 
 const commands: { [k: string]: (opts: any, userState: ChatUserstate) => void } = {
-    "!smashRandom": (opts, userState) => {
-        const selection = smashRandom(opts);
+    "!smashRandom": async (opts, userState) => {
+        const selection = await smashRandom(opts, userState.username);
         pennySay(`${userState.username} ${selection}`);
     },
-    "!sr5": (opts, userState) => {
-        const selection = smashRandom({ length: "5", fighterPack2: "true", fighterPack1: "true", oos: "true" });
+    "!sr5": async (opts, userState) => {
+        const selection = await smashRandom({
+            length: "5",
+            fighterPack2: "true",
+            fighterPack1: "true",
+            oos: "true",
+            bans: "false",
+            favs: "false"
+        });
         pennySay(`${userState.username} ${selection}`);
     },
     "!arena": (opts, userState) => {

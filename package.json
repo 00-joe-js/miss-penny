@@ -6,7 +6,7 @@
   "license": "ISC",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc && node --inspect dist/src/index.js",
+    "dev": "tsc && node dist/src/index.js",
     "bot-dev": "tsc && node --inspect dist/src/chatbot/bot.js",
     "start": "node dist/src/index.js",
     "bot": "node dist/src/chatbot/bot.js"
