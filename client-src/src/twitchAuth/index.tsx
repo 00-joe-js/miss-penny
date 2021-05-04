@@ -1,8 +1,16 @@
 import React from "react";
 
+const getOrigin = () => {
+    if (window.location.origin === "http://localhost:3000") {
+        return "http://localhost:7777";
+    } else {
+        return window.location.origin;
+    }
+};
+
 const twitchFirstStopURL = `https://id.twitch.tv/oauth2/authorize\
 ?client_id=quwrspx68engp5hv7b8ush3vn00zej\
-&redirect_uri=${window.location.origin}/biscuit\
+&redirect_uri=${getOrigin()}/biscuit\
 &response_type=code`;
 
 export const askForTwitchUserInfo = async () => {
@@ -15,8 +23,12 @@ export const askForTwitchUserInfo = async () => {
 const TwitchAuth = () => {
     return (
         <div id="twitch-auth-overlay">
-            <h3>I gotta know who you are on Twitch for this to matter 😃</h3>
-            <a href={twitchFirstStopURL}>Login with Twitch</a>
+            <h2 style={{ margin: "1.5rem 0 1rem 0" }}>😃 Hello there.</h2>
+            <h3 style={{ fontWeight: "lighter", margin: "0.5rem 0" }}>
+                If you login with Twitch, you can set your Smash Ultimate character preferences for the{"  "}
+                <strong>its_miss_penny <img src="/favicon.png" style={{ position: "relative", top: "7px", left: "-5px" }} /></strong> chat bot!
+            </h3>
+            <a style={{ fontSize: "1.75rem" }} href={twitchFirstStopURL}>Login with Twitch</a>
         </div>
     );
 };
