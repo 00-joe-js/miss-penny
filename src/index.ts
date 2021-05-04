@@ -2,7 +2,7 @@ import express from "express";
 import session from "express-session";
 const app = express();
 
-import client, { getUserPrefs, setUserPrefs, updatePrefs } from "./redis";
+import client, { getUserPrefs, setUserPrefs, updatePrefs, resetUserPrefs } from "./redis";
 
 import { NODE_ENV, SESSION_SECRET, FRONT_END_URL } from "../sens/env.json";
 
@@ -56,7 +56,7 @@ app.get("/twitch-user", async (req, res, next) => {
 app.get("/twitch-user-logout", (req, res) => {
     req.session.destroy(() => {
         res.redirect(FRONT_END_URL);
-    });   
+    });
 });
 
 app.get("/biscuit", async (req, res, next) => {
@@ -90,6 +90,19 @@ app.get("/biscuit", async (req, res, next) => {
 
     res.redirect(FRONT_END_URL); // This client will ask for Twitch user info
 
+});
+
+app.get("/reset-my-preferences-please-thank-you-joe", async (req, res, next) => {
+    try {
+        if (req.session.twitchUsername) {
+            await resetUserPrefs(req.session.twitchUsername);
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(401);
+        }
+    } catch (e) {
+        next(e);
+    }
 });
 
 app.use(express.json());

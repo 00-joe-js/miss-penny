@@ -114,10 +114,26 @@ main {
   background: rgba(255, 255, 255, 0.2);
 }
 
+
+
 .character-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
+  position: relative;
+}
+
+.character-list-tools {
+  position: absolute;
+  top: -2.5rem;
+  right: 1.5rem;
+}
+
+.character-list-tools button {
+  padding: 0.25rem;
+  background: purple;
+  color: white;
+  cursor: pointer;
 }
 
 #random-explain {

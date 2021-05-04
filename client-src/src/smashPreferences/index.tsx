@@ -31,6 +31,11 @@ const sendPrefToServer = async (twitchUsername: string, charId: string, prefStat
     return [whitelist, blacklist];
 };
 
+const resetUserPrefs = async () => {
+    const resetRes = await fetch("/reset-my-preferences-please-thank-you-joe");
+    return;
+};
+
 const Explain = ({ twitchUsername }: { twitchUsername: string }) => {
     return (
         <div id="random-explain">
@@ -123,6 +128,18 @@ const SmashPreferences = () => {
             <section id="smash-prefs-interface">
                 {!loggedIn ? <TwitchAuth /> : <Explain twitchUsername={username || ""} />}
                 {loggedIn && <div className="character-list">
+                    <div className="character-list-tools">
+                        <button onClick={() => {
+                            const prefsBeforeAction = canonicalUserPrefs;
+                            try {
+                                resetUserPrefs();
+                                setPrefs({whitelist: [], blacklist: []});
+                            } catch (e) {
+                                console.error(e);
+                                setPrefs(prefsBeforeAction);
+                            }
+                        }}>Reset</button>
+                    </div>
                     {allCharacters.map(char => {
                         return (
                             <CharacterDisplay

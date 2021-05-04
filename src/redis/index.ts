@@ -18,6 +18,10 @@ export const updatePrefs = (originalPrefs: Prefs, characterId: string, prefState
     return currentPrefs;
 };
 
+export const resetUserPrefs = async (twitchName: string) => {
+    await client.set(twitchName, JSON.stringify({ whitelist: [], blacklist: [] }));
+};
+
 export const getUserPrefs = async (twitchName: string) => {
     const result = await client.get(twitchName);
     if (result === null) {
