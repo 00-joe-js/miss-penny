@@ -1,4 +1,31 @@
 https://id.twitch.tv/oauth2/authorize
 ?client_id=quwrspx68engp5hv7b8ush3vn00zej
 &redirect_uri=http://localhost:7777/biscuit
-&response_type=code
+&response_type=cod
+
+
+Simple: !smashRandom() in chat
+> "You should play: GANONDORF!"
+
+You can provide a `length` argument: !smashRandom(length = 3)
+> "You should play: SAMUS || ROBIN || TERRY!"
+
+You can pick your favorite characters at https://joejs.live and randomize amongst them: 
+!smashRandom(favs = true)
+
+If you love doing randoms but can't stand when you get characters you hate,
+you can select your bans at https://joejs.live as well.
+!smashRandom(bans = true)
+
+Full list of args:
+    length
+        > How many characters to randomize. default: 1
+    fighterPack1, fighterPack2
+        > include or exclude DLC. default: true
+    favs
+        > only include your favorite characters. default: false
+    bans
+        > exclude characters you've banned. default: false
+    oos
+        > Replace all vowels with Os. default: false
+    

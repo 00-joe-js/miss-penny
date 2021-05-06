@@ -1,4 +1,4 @@
-interface SmashRandomOptions {
+export interface SmashRandomOptions {
     fighterPack1: string,
     fighterPack2: string,
     length: string,

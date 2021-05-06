@@ -4,44 +4,54 @@ import { Client } from "tmi.js";
 import { twitchToken, username, channels } from "../../sens/creds.json";
 
 import joesWorkingOn from "./commands/joesWorkingOn";
-import smashRandom from "./commands/smashRandom";
+import smashRandom, { SmashRandomOptions } from "./commands/smashRandom";
 import shareArena from "./commands/shareArena";
 
 const pennySay = (msg: string) => {
     twitchChatBotClient.say(channels[0], `joejsBbpenny ${msg}`);
 };
 
-const commands: { [k: string]: (opts: any, userState: ChatUserstate) => void } = {
+const defaultOptions: SmashRandomOptions = {
+    length: "1",
+    fighterPack2: "true",
+    fighterPack1: "true",
+    oos: "false",
+    bans: "false",
+    favs: "false"
+};
+
+const createRandomizerAlias = (uniqueOpts: Partial<SmashRandomOptions>) => {
+    return async (_: SmashRandomOptions, userState: ChatUserstate) => {
+        const selection = await smashRandom({ ...defaultOptions, ...uniqueOpts }, userState.username);
+        pennySay(`${userState.username} ${selection}`);
+    };
+};
+
+const commands: { [k: string]: (opts: SmashRandomOptions, userState: ChatUserstate) => void } = {
     "!smashRandom": async (opts, userState) => {
         const selection = await smashRandom(opts, userState.username);
         pennySay(`${userState.username} ${selection}`);
     },
-    "!sr5": async (opts, userState) => {
-        const selection = await smashRandom({
-            length: "5",
-            fighterPack2: "true",
-            fighterPack1: "true",
-            oos: "true",
-            bans: "false",
-            favs: "false"
-        });
-        pennySay(`${userState.username} ${selection}`);
+    "!arena": () => {
+        pennySay(shareArena());
     },
-    "!arena": (opts, userState) => {
-        const message = shareArena();
-        if (userState.username) {
-            // TODO: get bot account verified with twitch in order to whisper
-            pennySay(message);
-        }
+    "!joesWorkingOn": () => {
+        pennySay(joesWorkingOn());
     },
-    "!joesWorkingOn": (opts, userState) => {
-        const message = joesWorkingOn();
-        pennySay(message);
-    },
-    "!links": (opts, userState) => {
-        pennySay(`Hi~ :::: https://github.com/00-joe-js/how-to-file-upload :::: https://joejs.live`);
+    "!links": () => {
+        pennySay(`Hi~ :::: https://joejs.live`);
     },
 };
+
+commands["!r5"] = createRandomizerAlias({ length: "5" });
+
+commands["!fav"] = createRandomizerAlias({ favs: "true" });
+commands["!favs2"] = createRandomizerAlias({ length: "2", favs: "true" });
+commands["!favs3"] = createRandomizerAlias({ length: "3", favs: "true" });
+commands["!favs4"] = createRandomizerAlias({ length: "4", favs: "true" });
+commands["!favs5"] = createRandomizerAlias({ length: "5", favs: "true" });
+
+commands["!bansOn"] = createRandomizerAlias({ bans: "true", length: "1" });
 
 const spaces = /\s/gi;
 const parseParameters = (messageText: string) => {
@@ -65,7 +75,7 @@ const parseMessageToCommandRunner = (messageText: string, userState: ChatUsersta
         return null;
     } else {
         const parameters = parseParameters(messageText);
-        return commands[firstPart].bind(null, parameters, userState);
+        return commands[firstPart].bind(null, { ...defaultOptions, ...parameters }, userState);
     }
 };
 
