@@ -53,6 +53,7 @@ app.get("/twitch-user", async (req, res, next) => {
         next(e);
     }
 });
+
 app.get("/twitch-user-logout", (req, res) => {
     req.session.destroy(() => {
         res.redirect(FRONT_END_URL);
@@ -104,6 +105,9 @@ app.get("/reset-my-preferences-please-thank-you-joe", async (req, res, next) => 
         next(e);
     }
 });
+
+import randomizerHTTPApi from "./randomizer-http-api";
+app.use(randomizerHTTPApi);
 
 app.use(express.json());
 app.post("/submit-character-preference", async (req, res, next) => {
