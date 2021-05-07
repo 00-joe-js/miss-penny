@@ -20,7 +20,7 @@ app.get("/favicon.png", (_, res) => res.sendFile(resolve('./favicon.png')));
 app.use(express.static(resolve("./client-build")));
 app.use("/assets/characterIcons/", express.static(resolve("./sens/icons")));
 app.use("/penny-drop/", express.static(resolve("./sens/penny-drop-pics")));
-app.get("/", (_, res) => res.sendFile(resolve("./client-build/index.html")));
+app.get(["/", "/penny-overlay", "/glitch-overlay"], (_, res) => res.sendFile(resolve("./client-build/index.html")));
 
 import make from "connect-redis";
 const RedisStore = make(session);
