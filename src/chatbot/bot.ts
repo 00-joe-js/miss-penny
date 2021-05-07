@@ -1,4 +1,4 @@
-import { ChatUserstate, client } from "tmi.js";
+import { ChatUserstate } from "tmi.js";
 
 import { Client } from "tmi.js";
 import { twitchToken, username, channels } from "../../sens/creds.json";
@@ -6,6 +6,7 @@ import { twitchToken, username, channels } from "../../sens/creds.json";
 import joesWorkingOn from "./commands/joesWorkingOn";
 import smashRandom, { SmashRandomOptions } from "./commands/smashRandom";
 import shareArena from "./commands/shareArena";
+import pennyDrop from "./commands/pennyDrop";
 
 const pennySay = (msg: string) => {
     twitchChatBotClient.say(channels[0], `joejsBbpenny ${msg}`);
@@ -41,6 +42,9 @@ const commands: { [k: string]: (opts: SmashRandomOptions, userState: ChatUsersta
     "!links": () => {
         pennySay(`Hi~ :::: https://joejs.live`);
     },
+    "!pennyDrop": () => {
+        pennyDrop();
+    }
 };
 
 commands["!r5"] = createRandomizerAlias({ length: "5" });

@@ -6,7 +6,7 @@ import client, { getUserPrefs, setUserPrefs, updatePrefs, resetUserPrefs } from 
 
 import { NODE_ENV, SESSION_SECRET, FRONT_END_URL } from "../sens/env.json";
 
-import { clientSecret, clientId, redirectUri } from "../sens/creds.json";
+import { clientSecret, clientId, redirectUri, obsToken } from "../sens/creds.json";
 import fetch from "node-fetch";
 
 declare module 'express-session' {
@@ -19,6 +19,7 @@ import { resolve } from "path";
 app.get("/favicon.png", (_, res) => res.sendFile(resolve('./favicon.png')));
 app.use(express.static(resolve("./client-build")));
 app.use("/assets/characterIcons/", express.static(resolve("./sens/icons")));
+app.use("/penny-drop/", express.static(resolve("./sens/penny-drop-pics")));
 app.get("/", (_, res) => res.sendFile(resolve("./client-build/index.html")));
 
 import make from "connect-redis";
@@ -103,6 +104,23 @@ app.get("/reset-my-preferences-please-thank-you-joe", async (req, res, next) => 
         }
     } catch (e) {
         next(e);
+    }
+});
+
+app.get("/penny-drops", async (req, res) => {
+    if (req.query.code === obsToken) {
+        const keysToRead = await client.keys("pennyDrop*");
+        const values = await Promise.all(
+            keysToRead.map(async (k) => {
+                const reply = await client.get(k);
+                if (!reply) return null;
+                return JSON.parse(reply);
+            })
+        );
+        res.json(values);
+        keysToRead.forEach(k => client.del(k));
+    } else {
+        res.send("Nice try.")
     }
 });
 

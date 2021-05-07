@@ -9,6 +9,7 @@ import chance from "chance";
 const c = chance.Chance();
 
 if (window.location.pathname === "/glitch-overlay") {
+
   const GlitchOverlay = () => {
     const [artificialKey, set] = useState(Math.random());
     useEffect(() => {
@@ -16,24 +17,28 @@ if (window.location.pathname === "/glitch-overlay") {
         set(Math.random())
       }, 10000);
     }, []);
-    return (<div key={artificialKey}>
-      {"hi".repeat(7).split("").map(() => {
-        return (
-          <div style={{ position: "relative", height: "100px" }}>
-            <GlitchCanvas />
-          </div>
-        );
-      })}
-    </div>);
+    return (
+      <div key={artificialKey}>
+        {"hi".repeat(7).split("").map(() => {
+          return (
+            <div style={{ position: "relative", height: "100px" }}>
+              <GlitchCanvas />
+            </div>
+          );
+        })}
+      </div>
+    );
   };
+
   ReactDOM.render(<GlitchOverlay />, document.getElementById('root'));
+
 } else if (window.location.pathname === "/penny-overlay") {
 
   const PennyFloatsDownwards = ({ xPosition, src }: { xPosition: number, src: string }) => {
     const [y, setY] = useState(0);
 
     const xPx = useMemo(() => {
-      return `${xPosition}px`;
+      return `${xPosition}%`;
     }, [xPosition]);
 
     useEffect(() => {
@@ -59,37 +64,48 @@ if (window.location.pathname === "/glitch-overlay") {
   };
 
   const PennyOverlay = () => {
+
     const [drops, setDrops] = useState<PennyDropEntry[]>([]);
+
     useEffect(() => {
       const askServer = async () => {
-        // This will access entries from redis of
-        // Penny drop positions.
-        const res = await fetch("/penny-drops");
-        // Percentages? yeah -- or 0-(1920-100)
+
+        const res = await fetch(`/penny-drops${window.location.search}`);
+
         const dropPositions = await res.json();
         if (dropPositions.length === 0) return;
-        const newDrops = dropPositions.map((xPosition: number) => {
-          return { droppedAt: Date.now(), source: "pennydrop.jpg", xPosition };
-        });
-        setDrops(current => [...current, ...newDrops]);
-      };
-      const randomizeForNow = () => {
-        const howMany = c.integer({ min: 0, max: 2 });
-        if (howMany === 0) return;
-        const newDrops = "~".repeat(howMany).split("").map(() => {
+
+        const newDrops = dropPositions.map(({ xPosition, source }: { xPosition: number, source: string }) => {
           return {
             id: c.integer({ min: 1, max: 100000 }).toString(),
             droppedAt: Date.now(),
-            source: "pennydrop.jpg",
-            xPosition: randomXPositionOnScreen()
+            source,
+            xPosition
           };
         });
+
         setDrops(current => [...current, ...newDrops]);
       };
-      const i = setInterval(randomizeForNow, 500);
+
+      const i = setInterval(askServer, 2000);
+      return () => clearInterval(i);
+      
+    }, []);
+
+    useEffect(() => {
+      const CLEAN_UP_AFTER = 30 * 1000;
+      const cleanup = () => {
+        setDrops(currentDrops => {
+          const now = Date.now();
+          if (currentDrops.length === 0) return currentDrops;
+          const stillDropping = currentDrops.filter(drop => now - drop.droppedAt < CLEAN_UP_AFTER);
+          return stillDropping;
+        });
+      };
+      const i = setInterval(cleanup, 3000);
       return () => clearInterval(i);
     }, []);
-    const randomXPositionOnScreen = () => c.integer({ min: 0, max: window.innerWidth - 50 });
+
     return (
       <div>
         {drops.map(drop => {
@@ -99,9 +115,13 @@ if (window.location.pathname === "/glitch-overlay") {
         })}
       </div>
     );
+
   };
+
   ReactDOM.render(<PennyOverlay />, document.getElementById('root'));
+
 } else {
+
   const Root = () => {
     const [glitchKey, setGlitchKey] = useState(Math.random());
     return (
@@ -116,7 +136,8 @@ if (window.location.pathname === "/glitch-overlay") {
         </main>
       </React.StrictMode>
     );
-
   };
+
   ReactDOM.render(<Root />, document.getElementById('root'));
+
 }
