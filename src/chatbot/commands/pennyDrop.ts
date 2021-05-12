@@ -19,4 +19,8 @@ export const quarterDrop = () => {
     "~".repeat(25).split("").forEach(dropOnePenny);
 };
 
+export const dollarDrop = () => {
+    "~".repeat(100).split("").forEach(dropOnePenny);
+};
+
 export default dropOnePenny;

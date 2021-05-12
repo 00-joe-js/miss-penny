@@ -6,7 +6,7 @@ import { twitchToken, username, channels } from "../../sens/creds.json";
 import joesWorkingOn from "./commands/joesWorkingOn";
 import smashRandom, { SmashRandomOptions } from "./commands/smashRandom";
 import shareArena from "./commands/shareArena";
-import pennyDrop, {quarterDrop} from "./commands/pennyDrop";
+import pennyDrop, { quarterDrop, dollarDrop } from "./commands/pennyDrop";
 
 const pennySay = (msg: string) => {
     twitchChatBotClient.say(channels[0], `joejsBbpenny ${msg}`);
@@ -47,6 +47,9 @@ const commands: { [k: string]: (opts: SmashRandomOptions, userState: ChatUsersta
     },
     "!quarterDrop": () => {
         quarterDrop();
+    },
+    "!dollarDrop": () => {
+        dollarDrop();
     }
 };
 
