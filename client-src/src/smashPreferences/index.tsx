@@ -32,15 +32,15 @@ const sendPrefToServer = async (twitchUsername: string, charId: string, prefStat
 };
 
 const resetUserPrefs = async () => {
-    const resetRes = await fetch("/reset-my-preferences-please-thank-you-joe");
-    return;
+    await fetch("/reset-my-preferences-please-thank-you-joe");
+    return true;
 };
 
 const Explain = ({ twitchUsername }: { twitchUsername: string }) => {
     return (
         <div id="random-explain">
             <h2>Hi, <span>{twitchUsername}!</span></h2>
-            <a href="" onClick={(e) => {
+            <a href="/" onClick={(e) => {
                 e.preventDefault();
                 fetch("/twitch-user-logout").then(() => window.location.reload());
             }}>Logout</a>
@@ -133,7 +133,7 @@ const SmashPreferences = () => {
                             const prefsBeforeAction = canonicalUserPrefs;
                             try {
                                 resetUserPrefs();
-                                setPrefs({whitelist: [], blacklist: []});
+                                setPrefs({ whitelist: [], blacklist: [] });
                             } catch (e) {
                                 console.error(e);
                                 setPrefs(prefsBeforeAction);
