@@ -4,7 +4,7 @@ import chance from "chance";
 const c = chance.Chance();
 
 const PennyFloatsDownwards = ({ xPosition, src }: { xPosition: number, src: string }) => {
-    const [y, setY] = useState(0);
+    const [y, setY] = useState(c.integer({ min: 0, max: 100 }));
 
     const xPx = useMemo(() => {
         return `${xPosition}%`;
