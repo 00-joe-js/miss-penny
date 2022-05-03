@@ -35,11 +35,13 @@ export default (app: Express) => {
             console.log(`Listening on ${PORT}`);
         });
 
-        establishSSLVerificationRoutes(app);
         setUpHTTPRedirectionServer();
+        establishSSLVerificationRoutes(app);
+
     } else {
         // Let Express set up the normal HTTP server.
-        app.listen(PORT, () => console.log(`Here for you on ${PORT}`));
+        establishSSLVerificationRoutes(app);
+        app.listen(80, () => console.log(`Here for you on 80`));
     }
 
 };

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>gummy duck</title>
+</head>
+<style>
+    @font-face {
+        font-family: "YoungStyle";
+        src: url("/Young\ Style.ttf") format("truetype");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    #lol-logo {
+        position: fixed;
+        font-family: "YoungStyle";
+        color: black;
+        font-size: 135px;
+        font-weight: bold;
+        -webkit-font-smoothing: antialiased;
+        top: 125px;
+        left: 250px;
+        text-align: center;
+        line-height: 160px;
+        opacity: 0;
+    }
+</style>
+
+<body>
+    <div id="page-container">
+        <div id="lol-logo">
+            Gummy
+            <br />Duck
+        </div>
+    </div>
+    <script defer src="/node_modules/three/build/three.js"></script>
+    <script defer src="/node_modules/three/examples/js/loaders/GLTFLoader.js"></script>
+    <script defer src="/node_modules/oimo/build/oimo.js"></script>
+    <script defer src="/script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const logo = document.querySelector("#lol-logo");
+
+            setTimeout(() => {
+                let opacity = 0;
+                const maxOpacity = 0.9;
+                setInterval(() => {
+                    opacity += 0.01;
+
+                    if (opacity >= maxOpacity) return;
+                    logo.style.opacity = opacity.toString();
+                }, 20);
+            }, 6000);
+        });
+    </script>
+</body>
+
+</html>
