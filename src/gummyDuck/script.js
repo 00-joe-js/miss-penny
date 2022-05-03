@@ -1,5 +1,23 @@
 const randomElement = arr => arr[Math.floor(Math.random() * arr.length)];
 
+const myDebounce = (fn, after) => {
+
+    let onGoing = null;
+    return () => {
+
+        if (onGoing) {
+            clearTimeout(onGoing);
+        }
+
+        onGoing = setTimeout(() => {
+            fn();
+            onGoing = null;
+        }, after);
+
+    };
+
+};
+
 const getRandomGummyColor = (function () {
     const GUMMY_COLORS = [
         0xD1EE58,
@@ -17,6 +35,15 @@ const getRandomGummyColor = (function () {
         return randomElement(GUMMY_COLORS);
     };
 })();
+
+const screenResolutionNormal = () => {
+    return new THREE.Vector2(window.innerWidth, window.innerHeight);
+};
+
+const setViewport = (renderer, uniforms) => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    uniforms.forEach(u => u.u_Resolution.value = new THREE.Vector2(window.innerWidth, window.innerHeight));
+};
 
 const randomRotationVector = () => {
     return [randomBetween(0, 360), randomBetween(0, 360), randomBetween(0, 360)]
@@ -47,7 +74,8 @@ const loadDuckyModel = () => {
 
 const createShaderMaterial = (vertexShader, fragmentShader) => {
     const uniforms = {
-        u_Rand: { value: 0.0, type: "float" }
+        u_Rand: { value: 0.0, type: "float" },
+        u_Resolution: { value: new THREE.Vector2() }
     };
     const material = new THREE.ShaderMaterial({
         uniforms,
@@ -55,6 +83,7 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
         fragmentShader,
         transparent: true
     });
+    uniforms.u_Resolution.value = screenResolutionNormal();
     return [material, uniforms];
 };
 
@@ -76,7 +105,6 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
     // scene.add(directionalLight);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0xFCE77D);
     renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
     document.querySelector("#page-container").appendChild(renderer.domElement);
@@ -92,12 +120,9 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
     const amountOfDucks = 200;
 
     const [vertexShader, fragmentShader] = await loadShaders();
-    const [testMaterial, shaderUniforms] = createShaderMaterial(vertexShader, fragmentShader);
-    console.log(testMaterial);
 
     const gltf = await loadDuckyModel();
     const originalDuck = gltf.scene.children[0].children[1];
-
 
     const ducks = [];
     for (let i = 0; i < amountOfDucks; i++) {
@@ -122,11 +147,10 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
                 density: 2
             });
             hm.connectMesh(duckMesh);
-            ducks.push({ mesh: duckMesh, physicsRep: hm });
+            ducks.push({ mesh: duckMesh, physicsRep: hm, uniforms: shaderUniforms });
         }, randomBetween(0, 2000));
 
     }
-
 
     const groundGeometry = new THREE.BoxGeometry(2, 1);
     const grMaterial = new THREE.MeshPhongMaterial({ color: 0xF96167 });
@@ -163,6 +187,9 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
         renderer.render(scene, camera);
     };
 
+    setViewport(renderer, ducks.map(d => d.uniforms));
+    window.addEventListener("resize", myDebounce(() => setViewport(renderer, ducks.map(d => d.uniforms)), 70));
+
     setInterval(() => {
         console.group("Render report");
         console.log("Scene polycount:", renderer.info.render.triangles)
@@ -182,29 +209,6 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
         });
 
     }, 1000);
-
-    setTimeout(() => {
-        const duckMesh = originalDuck.clone();
-        duckMesh.scale.x = 0.02;
-        duckMesh.scale.y = 0.02;
-        duckMesh.scale.z = 0.02;
-        const [testMaterial, shaderUniforms] = createShaderMaterial(vertexShader, fragmentShader);
-        duckMesh.material = testMaterial;
-        scene.add(duckMesh);
-
-        shaderUniforms.u_Rand.value = Math.random();
-
-        const hm = world.add({
-            type: "cylinder",
-            pos: [randomBetween(30, 50), randomBetween(1000, 1500), randomBetween(-20, 5)],
-            rot: randomRotationVector(),
-            size: [2, 2, 2],
-            move: true,
-            density: 2
-        });
-        hm.connectMesh(duckMesh);
-        ducks.push({ mesh: duckMesh, physicsRep: hm });
-    }, 12000);
 
 })();
 
