@@ -18,6 +18,13 @@ declare module 'express-session' {
 import { resolve } from "path";
 app.get("/favicon.png", (_, res) => res.sendFile(resolve('./favicon.png')));
 app.use(express.static(resolve("./client-build")));
+
+/* QUACK QUACK QUACK */
+import gummyDuckSection from "./gummyDuck/router";
+console.log(resolve("./src/gummyDuck"));
+app.use(express.static(resolve("./src/gummyDuck")));
+app.use("/gummyduck", gummyDuckSection);
+
 app.use("/assets/characterIcons/", express.static(resolve("./sens/icons")));
 app.use("/penny-drop/", express.static(resolve("./sens/penny-drop-pics")));
 app.get(["/", "/penny-overlay", "/glitch-overlay"], (_, res) => res.sendFile(resolve("./client-build/index.html")));
@@ -139,3 +146,5 @@ app.post("/submit-character-preference", async (req, res, next) => {
 
 import startServer from "./startServer";
 startServer(app);
+
+

@@ -40,7 +40,7 @@ const commands: { [k: string]: (opts: SmashRandomOptions, userState: ChatUsersta
         pennySay(joesWorkingOn());
     },
     "!links": () => {
-        pennySay(`Hi~ :::: https://joejs.live :::: https://gist.github.com/00-joe-js/0089b1450b64710776610134cb0fd685`);
+        pennySay(`Hi~ :::: https://joejs.live ::: https://github.com/00-joe-js`);
     },
     "!pennyDrop": () => {
         pennyDrop();
