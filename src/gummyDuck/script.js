@@ -144,7 +144,7 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
                 rot: randomRotationVector(),
                 size: [2, 2, 2],
                 move: true,
-                density: 2
+                density: 10
             });
             hm.connectMesh(duckMesh);
             ducks.push({ mesh: duckMesh, physicsRep: hm, uniforms: shaderUniforms });
@@ -203,8 +203,8 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
         ducks.forEach((aDuck) => {
             const x = aDuck.physicsRep.position.x;
             if (x < -70 || x > 70) {
-                scene.remove(aDuck.mesh);
-                // aDuck.physicsRep.resetPosition({x: });
+                // scene.remove(aDuck.mesh);
+                aDuck.physicsRep.resetPosition(randomBetween(30, 50), randomBetween(1000, 1500), randomBetween(-20, 5));
             }
         });
 
