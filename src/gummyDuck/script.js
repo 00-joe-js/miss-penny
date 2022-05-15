@@ -87,22 +87,17 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
     return [material, uniforms];
 };
 
+window.scrollTo({ top: 0 });
 
 (async () => {
 
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 26;
+    camera.position.z = 25;
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.x = 0;
-    directionalLight.position.y = 10;
-    directionalLight.position.z = 10;
-    // scene.add(directionalLight);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setClearColor(0xFCE77D);
@@ -117,7 +112,7 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
         info: true
     });
 
-    const amountOfDucks = 200;
+    const amountOfInitialDucks = 100;
 
     const [vertexShader, fragmentShader] = await loadShaders();
 
@@ -125,7 +120,7 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
     const originalDuck = gltf.scene.children[0].children[1];
 
     const ducks = [];
-    for (let i = 0; i < amountOfDucks; i++) {
+    for (let i = 0; i < amountOfInitialDucks; i++) {
 
         setTimeout(() => {
             const duckMesh = originalDuck.clone();
@@ -177,27 +172,93 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
     dividerMesh.rotation.z = Math.PI / 18;
     scene.add(dividerMesh);
 
-    world.play();
+    const blackPlaneG = new THREE.PlaneGeometry(1, 1);
+    const blackPlane = new THREE.Mesh(blackPlaneG, new THREE.MeshBasicMaterial({ color: 0x00000 }));
+    blackPlane.position.z = 20;
+    scene.add(blackPlane);
 
-    renderer.render(scene, camera);
+    window.GROW_PANE = (portionOfScale) => {
+        const SCALE = 15 * portionOfScale;
+
+        if (portionOfScale < 1) {
+            world.play();
+            tearDownSecondSection();
+        } else {
+            ducks.forEach((aDuck) => {
+                const z = aDuck.physicsRep.position.z;
+                if (z > 15) {
+                    scene.remove(aDuck.mesh);
+                }
+            });
+            world.stop();
+            triggerSecondSection();
+        }
+
+        if (portionOfScale < 0.5) {
+            blackPlane.scale.set(SCALE / 50, SCALE * 2, 0);
+        } else {
+            blackPlane.scale.set(SCALE / (40 - (39 * portionOfScale)), SCALE, 0);
+        }
+    };
+
+
+    let secondSceneActive = false;
+    let secondSceneDestroyFn = null;
+    const triggerSecondSection = () => {
+        if (!secondSceneActive) {
+            secondSceneActive = true;
+        } else {
+            return;
+        }
+
+        const cubey = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+        cubey.position.set(0, -5, 21);
+
+        const secondSceneInterval = setInterval(() => {
+            if (cubey.position.y < 0) {
+                cubey.position.y += 0.02;
+            }
+            cubey.rotateOnAxis(new THREE.Vector3(1, 0, 0), 0.01);
+            cubey.rotateOnAxis(new THREE.Vector3(0, 0, 1), 0.03);
+        }, 10);
+        scene.add(cubey);
+
+        secondSceneDestroyFn = () => {
+            clearInterval(secondSceneInterval);
+            scene.remove(cubey);
+        };
+    };
+
+    const tearDownSecondSection = () => {
+        if (secondSceneActive) {
+            secondSceneActive = false;
+            secondSceneDestroyFn && secondSceneDestroyFn();
+        }
+    };
 
     ground.connectMesh(groundMesh);
 
-    world.postLoop = function () {
+    world.play();
+
+    const loop = function () {
         renderer.render(scene, camera);
+        requestAnimationFrame(loop);
     };
+    requestAnimationFrame(loop);
 
     setViewport(renderer, ducks.map(d => d.uniforms));
     window.addEventListener("resize", myDebounce(() => setViewport(renderer, ducks.map(d => d.uniforms)), 70));
 
+    window.GROW_PANE(0);
+
     setInterval(() => {
-        console.group("Render report");
-        console.log("Scene polycount:", renderer.info.render.triangles)
-        console.log("Active Drawcalls:", renderer.info.render.calls)
-        console.log("Textures in Memory", renderer.info.memory.textures)
-        console.log("Geometries in Memory", renderer.info.memory.geometries)
-        console.log("Full Info", renderer.info)
-        console.groupEnd();
+        // console.group("Render report");
+        // console.log("Scene polycount:", renderer.info.render.triangles)
+        // console.log("Active Drawcalls:", renderer.info.render.calls)
+        // console.log("Textures in Memory", renderer.info.memory.textures)
+        // console.log("Geometries in Memory", renderer.info.memory.geometries)
+        // console.log("Full Info", renderer.info)
+        // console.groupEnd();
 
         // Cleanup.
         ducks.forEach((aDuck) => {
