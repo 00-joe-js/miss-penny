@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
     <title>gummy duck</title>
 </head>
 <style>
@@ -22,6 +23,10 @@
         font-weight: bold;
     }
 
+    html {
+        font-size: 24px;
+    }
+
     body,
     #page-container {
         height: 300vh;
@@ -29,21 +34,10 @@
         padding: 0;
     }
 
-    #lol-logo {
-        font-family: "YoungStyle";
-        color: black;
-        font-size: 120px;
-        font-weight: bold;
-        -webkit-font-smoothing: antialiased;
-        text-align: center;
-        line-height: 170px;
-        opacity: 0;
-        transition: opacity 3s, color 2s;
-    }
-
     main {
         width: 100%;
         height: 100vh;
+        max-height: 100vh;
         background: rgba(0, 0, 0, 0.0);
         transition: background 1s;
         position: relative;
@@ -58,6 +52,26 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        justify-content: space-evenly;
+    }
+
+    #lol-logo {
+        font-family: "YoungStyle";
+        color: black;
+        font-weight: bold;
+        -webkit-font-smoothing: antialiased;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 3s, color 2s;
+
+        font-size: 6rem;
+        line-height: 7rem;
+    }
+
+    @media screen and (max-width:480px) {
+        #opening-container {
+            align-items: center;
+        }
     }
 
     #opening-details {
@@ -68,7 +82,7 @@
 
     #opening-container p {
         color: rgb(255, 255, 220);
-        font-size: 24px;
+        font-size: 1rem;
         font-family: "Sinkin";
     }
 
@@ -119,6 +133,10 @@
                         <a href="#">Work with us.</a>
                     </p>
                 </div>
+                <video style="height: 0; width: 0;" src="/vastlevel5vid.webm" loop></video>
+            </div>
+            <div id="">
+
             </div>
         </main>
     </div>
@@ -127,13 +145,43 @@
     <script defer src="/node_modules/oimo/build/oimo.js"></script>
     <script defer src="/script.js"></script>
     <script>
+
+        const sel = document.querySelector.bind(document);
+
+        const configureStart = () => {
+            window.onbeforeunload = () => {
+                window.scrollTo(0, 0);
+            };
+            manageFontSizes();
+        };
+
+
+        const manageFontSizes = (container) => {
+            const htmlE = document.querySelector("html");
+            const setSizeWithWindow = () => {
+                let computedFontSize = (((window.innerHeight / window.devicePixelRatio) / 1080) * 12) + 8;
+                computedFontSize += ((window.innerWidth / window.devicePixelRatio) / 1920) * 4;
+                htmlE.style.fontSize = (THREE.MathUtils.clamp(computedFontSize, 12, 28)) + "px";
+            };
+            setSizeWithWindow();
+            window.addEventListener("resize", () => {
+                setSizeWithWindow();
+            });
+        };
+
         document.addEventListener("DOMContentLoaded", () => {
-            const sel = document.querySelector.bind(document);
+
             const main = sel("main");
-            const mainHeight = main.clientHeight;
             const logo = sel("#lol-logo");
             const details = sel("#opening-details");
 
+            const mainHeight = main.clientHeight;
+
+            configureStart();
+
+            document.addEventListener("click", () => {
+                document.querySelector("video").play();
+            });
 
             window.addEventListener("scroll", () => {
                 const scrolledFromTop = window.scrollY;
@@ -142,15 +190,26 @@
                 }
             });
 
-            setTimeout(() => {
-                logo.style.opacity = 0.8;
-            }, 1000);
+            const k = "saidawaygoestroubledownthedrain";
+            const beenHereBefore = localStorage.getItem(k);
+            if (!beenHereBefore) {
+                localStorage.setItem(k, " ");
+                setTimeout(() => {
+                    logo.style.opacity = 0.8;
+                }, 1000);
 
-            setTimeout(() => {
+                setTimeout(() => {
+                    logo.style.color = "rgb(255, 255, 130)";
+                    main.style.background = "rgba(0, 0, 0, 0.95)";
+                    details.style.opacity = 1;
+                }, 5000);
+            } else {
+                logo.style.opacity = 0.8;
                 logo.style.color = "rgb(255, 255, 130)";
                 main.style.background = "rgba(0, 0, 0, 0.95)";
                 details.style.opacity = 1;
-            }, 5000);
+            }
+
 
         });
     </script>

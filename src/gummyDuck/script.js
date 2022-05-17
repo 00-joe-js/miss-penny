@@ -41,8 +41,10 @@ const screenResolutionNormal = () => {
 };
 
 const setViewport = (renderer, uniforms) => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    uniforms.forEach(u => u.u_Resolution.value = new THREE.Vector2(window.innerWidth, window.innerHeight));
+    const width = (window.innerWidth / window.devicePixelRatio);
+    const height = (window.innerHeight / window.devicePixelRatio);
+    renderer.setSize(width, height);
+    uniforms.forEach(u => u.u_Resolution.value = new THREE.Vector2(width, height));
 };
 
 const randomRotationVector = () => {
@@ -70,6 +72,19 @@ const loadDuckyModel = () => {
         loader.load("/Duck.glb", res, null, rej);
     });
     return loadingPromise;
+};
+
+const loadTexture = (url) => {
+    const loadingPromise = new Promise((res, rej) => {
+        const loader = new THREE.TextureLoader();
+        loader.load(url, res, null, rej);
+    });
+    return loadingPromise;
+};
+
+const loadVid = (selector) => {
+    const video = document.querySelector(selector);
+    return new THREE.VideoTexture(video);
 };
 
 const createShaderMaterial = (vertexShader, fragmentShader) => {
@@ -112,11 +127,13 @@ window.scrollTo({ top: 0 });
         info: true
     });
 
-    const amountOfInitialDucks = 100;
+    const amountOfInitialDucks = 250;
 
     const [vertexShader, fragmentShader] = await loadShaders();
 
     const gltf = await loadDuckyModel();
+    const vastGif = loadVid("video");
+
     const originalDuck = gltf.scene.children[0].children[1];
 
     const ducks = [];
@@ -186,16 +203,19 @@ window.scrollTo({ top: 0 });
         } else {
             ducks.forEach((aDuck) => {
                 const z = aDuck.physicsRep.position.z;
-                if (z > 15) {
+                if (z > 20) {
                     scene.remove(aDuck.mesh);
                 }
             });
-            world.stop();
-            triggerSecondSection();
+            setTimeout(() => {
+                world.stop();
+                triggerSecondSection();
+            }, 100);
+
         }
 
         if (portionOfScale < 0.5) {
-            blackPlane.scale.set(SCALE / 50, SCALE * 2, 0);
+            blackPlane.scale.set(SCALE / 20, SCALE * 2, 0);
         } else {
             blackPlane.scale.set(SCALE / (40 - (39 * portionOfScale)), SCALE, 0);
         }
@@ -211,21 +231,50 @@ window.scrollTo({ top: 0 });
             return;
         }
 
-        const cubey = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-        cubey.position.set(0, -5, 21);
+        const fullGroup = new THREE.Group();
+        const platGroup = new THREE.Group();
+
+        const cubey = new THREE.Mesh(new THREE.BoxGeometry(7, 0.2, 1), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+        const redCubey = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 0.1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+
+        platGroup.add(cubey);
+        platGroup.add(redCubey);
+        fullGroup.position.set(0, -1, 22);
+        fullGroup.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 9);
+
+        fullGroup.scale.set(0.5, 0.5, 0.5);
+
+        const pointLight = new THREE.PointLight(0xFCE77D, 0.3);
+
+        fullGroup.add(pointLight);
+
+        redCubey.position.x = 2;
+        redCubey.position.y = 1;
+        redCubey.position.z = -0.4;
+
+        const screen = new THREE.Mesh(new THREE.BoxGeometry(16 / 4, 9 / 4, 0.05), new THREE.MeshPhongMaterial({
+            map: vastGif, shininess: 200
+        }));
+        fullGroup.add(screen);
+        screen.position.y = 3;
+        screen.position.x = -1.5;
+        screen.position.z = -0.4;
+        pointLight.position.z = 50;
 
         const secondSceneInterval = setInterval(() => {
-            if (cubey.position.y < 0) {
-                cubey.position.y += 0.02;
-            }
-            cubey.rotateOnAxis(new THREE.Vector3(1, 0, 0), 0.01);
-            cubey.rotateOnAxis(new THREE.Vector3(0, 0, 1), 0.03);
+            screen.rotation.y = Math.sin(Date.now() / 4000) * (Math.PI / 20);
+            pointLight.position.x = Math.sin(Date.now() / 1000) * 10 - 20;
+            pointLight.position.y = Math.cos(Date.now() / 5000) * 20;
+            platGroup.rotation.z = Math.cos(Date.now() / 1000) / 30;
+            platGroup.rotation.y = Math.sin(Date.now() / 500) / 50;
         }, 10);
-        scene.add(cubey);
+
+        fullGroup.add(platGroup);
+        scene.add(fullGroup);
 
         secondSceneDestroyFn = () => {
             clearInterval(secondSceneInterval);
-            scene.remove(cubey);
+            scene.remove(fullGroup);
         };
     };
 

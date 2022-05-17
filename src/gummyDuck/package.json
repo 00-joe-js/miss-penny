@@ -13,6 +13,7 @@
   "dependencies": {
     "http-server": "^14.1.0",
     "oimo": "^1.0.9",
-    "three": "^0.139.2"
+    "three": "^0.139.2",
+    "three-gif-loader": "^1.1.0"
   }
 }
