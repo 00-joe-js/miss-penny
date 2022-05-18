@@ -41,8 +41,8 @@ const screenResolutionNormal = () => {
 };
 
 const setViewport = (renderer, uniforms) => {
-    const width = (window.innerWidth / window.devicePixelRatio);
-    const height = (window.innerHeight / window.devicePixelRatio);
+    const width = (window.innerWidth);
+    const height = (window.innerHeight);
     renderer.setSize(width, height);
     uniforms.forEach(u => u.u_Resolution.value = new THREE.Vector2(width, height));
 };
@@ -102,7 +102,94 @@ const createShaderMaterial = (vertexShader, fragmentShader) => {
     return [material, uniforms];
 };
 
-window.scrollTo({ top: 0 });
+const sel = document.querySelector.bind(document);
+
+const gamePortfElement = sel("#game-portfolio-section");
+const webSection = sel("#web-section");
+
+const activateSecondSectionDOM = () => {
+    gamePortfElement.style.position = "fixed";
+    gamePortfElement.style.top = 0;
+    gamePortfElement.style.left = 0;
+    webSection.style.marginTop = "300vh";
+};
+
+const deactivateSecondSectionDOM = () => {
+    gamePortfElement.style.position = "static";
+    webSection.style.marginTop = 0;
+};
+
+(async () => {
+
+    const main = sel("main");
+
+    const configureStart = () => {
+        window.onbeforeunload = () => {
+            window.scrollTo(0, 0);
+        };
+        document.addEventListener("click", () => {
+            document.querySelector("video").play();
+        });
+        manageFontSizes();
+    };
+
+    const playOpening = () => {
+        const logo = sel("#lol-logo");
+        const details = sel("#opening-details");
+        const k = "saidawaygoestroubledownthedrain";
+        const beenHereBefore = localStorage.getItem(k);
+        if (!beenHereBefore) {
+            localStorage.setItem(k, " ");
+            setTimeout(() => {
+                logo.style.opacity = 0.8;
+            }, 1000);
+
+            setTimeout(() => {
+                logo.style.color = "rgb(255, 255, 130)";
+                main.style.background = "rgba(0, 0, 0, 0.95)";
+                details.style.opacity = 1;
+            }, 5000);
+        } else {
+            logo.style.opacity = 0.8;
+            logo.style.color = "rgb(255, 255, 130)";
+            main.style.background = "rgba(0, 0, 0, 0.95)";
+            details.style.opacity = 1;
+        }
+    };
+
+    const manageFontSizes = (container) => {
+        const htmlE = document.querySelector("html");
+        const setSizeWithWindow = () => {
+            let computedFontSize = (((window.innerHeight / window.devicePixelRatio) / 1080) * 12) + 8;
+            computedFontSize += ((window.innerWidth / window.devicePixelRatio) / 1920) * 4;
+            htmlE.style.fontSize = (THREE.MathUtils.clamp(computedFontSize, 12, 28)) + "px";
+        };
+        setSizeWithWindow();
+        window.addEventListener("resize", () => {
+            setSizeWithWindow();
+        });
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const mainHeight = main.clientHeight;
+
+        configureStart();
+
+        window.addEventListener("scroll", () => {
+            if (window.GROW_PANE) {
+                window.GROW_PANE(Math.min(1, window.scrollY / mainHeight));
+            }
+            if (window.SHOW_THIRD) {
+                window.SHOW_THIRD(window.scrollY);
+            }
+        });
+
+        playOpening();
+
+    });
+
+})();
 
 (async () => {
 
@@ -195,23 +282,28 @@ window.scrollTo({ top: 0 });
     scene.add(blackPlane);
 
     window.GROW_PANE = (portionOfScale) => {
-        const SCALE = 15 * portionOfScale;
+
+        if (thirdSceneActive) return;
+
+        const SCALE = 18 * portionOfScale;
 
         if (portionOfScale < 1) {
             world.play();
             tearDownSecondSection();
+            deactivateSecondSectionDOM();
         } else {
+            if (secondSceneActive) return;
             ducks.forEach((aDuck) => {
                 const z = aDuck.physicsRep.position.z;
-                if (z > 20) {
+                if (z > 18) {
                     scene.remove(aDuck.mesh);
                 }
             });
+            activateSecondSectionDOM();
             setTimeout(() => {
                 world.stop();
                 triggerSecondSection();
             }, 100);
-
         }
 
         if (portionOfScale < 0.5) {
@@ -221,9 +313,25 @@ window.scrollTo({ top: 0 });
         }
     };
 
+    const webSectionOffset = webSection.offsetTop;
+
+    window.SHOW_THIRD = (scrollY) => {
+        if (scrollY >= webSectionOffset) {
+            if (thirdSceneActive === true) return;
+            thirdSceneActive = true;
+            triggerThirdSection();
+            deactivateSecondSectionDOM();
+            tearDownSecondSection();
+        } else {
+            tearDownThirdSection();
+        }
+    };
+
 
     let secondSceneActive = false;
+    let thirdSceneActive = false;
     let secondSceneDestroyFn = null;
+    let thirdSceneDestroyFn = null;
     const triggerSecondSection = () => {
         if (!secondSceneActive) {
             secondSceneActive = true;
@@ -285,6 +393,98 @@ window.scrollTo({ top: 0 });
         }
     };
 
+    const triggerThirdSection = () => {
+
+        const group = new THREE.Group();
+        const ducky = originalDuck.clone();
+
+        ducky.scale.x = 0.01;
+        ducky.scale.y = 0.01;
+        ducky.scale.z = 0.01;
+
+        ducky.position.x = -1;
+        ducky.position.y = -0.8;
+
+        const duckUniforms = {
+            u_mouse_x: { value: 0.0 },
+            u_time: { value: 0.0 },
+            u_tex: { value: new THREE.TextureLoader().load("https://s3-us-west-2.amazonaws.com/s.cdpn.io/2666677/explosion.png") }
+        };
+        ducky.material = new THREE.ShaderMaterial({
+            uniforms: duckUniforms,
+            wireframe: true,
+            vertexShader: `
+                #include <noise>
+                
+                varying float v_noise;
+                
+                uniform float u_mouse_x;
+                uniform float u_time;
+                
+                void main() {	
+                    v_noise = 15.0 * -0.1 * turbulence(0.5 * normal + (u_time / 10000.0) * 1.4);
+                    float b = ((u_mouse_x - 200.0) / 100.0) * pnoise(0.05 * position, vec3(100.0));
+                    float displacement = b - 10.0 * v_noise;
+                    vec3 pos = position + normal * displacement;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
+                }
+            `,
+            fragmentShader: `
+                #define PI 3.141592653589
+                #define PI2 6.28318530718
+                                
+                varying float v_noise;
+                
+                uniform float u_mouse_x;
+                uniform sampler2D u_tex;
+                
+                float random( vec3 pt, float seed ){
+                    vec3 scale = vec3( 12.9898, 78.233, 151.7182 );
+                    return fract( sin( dot( pt + seed, scale ) ) * 43758.5453 + seed ) ;
+                }
+                
+                void main (void)
+                {
+                    float r = .01 * random(gl_FragCoord.xyz, 0.0);
+                    vec2 uv = vec2(0, 1.3 * v_noise + r);
+                    vec4 texelColor = texture2D(u_tex, uv);
+                    vec3 color = vec3(texelColor.r, 1.0, (1.0-texelColor.r));
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `
+        });
+
+        group.add(ducky);
+        scene.add(group);
+
+        group.position.z = 23;
+
+        const yAxis = new THREE.Vector3(0, 1, 0);
+        const rotating = setInterval(() => {
+            duckUniforms.u_time.value += 12.0;
+            ducky.rotateOnAxis(yAxis, Math.PI / 1024);
+        }, 10);
+
+        const setMouseX = (e) => {
+            duckUniforms.u_mouse_x.value = e.screenX;
+        };
+
+        document.addEventListener("mousemove", setMouseX);
+
+        thirdSceneDestroyFn = () => {
+            scene.remove(group);
+            clearInterval(rotating);
+            document.removeEventListener("mousemove", setMouseX);
+        };
+    };
+
+    const tearDownThirdSection = () => {
+        if (thirdSceneActive) {
+            thirdSceneActive = false;
+            thirdSceneDestroyFn && thirdSceneDestroyFn();
+        }
+    };
+
     ground.connectMesh(groundMesh);
 
     world.play();
@@ -301,13 +501,6 @@ window.scrollTo({ top: 0 });
     window.GROW_PANE(0);
 
     setInterval(() => {
-        // console.group("Render report");
-        // console.log("Scene polycount:", renderer.info.render.triangles)
-        // console.log("Active Drawcalls:", renderer.info.render.calls)
-        // console.log("Textures in Memory", renderer.info.memory.textures)
-        // console.log("Geometries in Memory", renderer.info.memory.geometries)
-        // console.log("Full Info", renderer.info)
-        // console.groupEnd();
 
         // Cleanup.
         ducks.forEach((aDuck) => {

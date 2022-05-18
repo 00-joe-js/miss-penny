@@ -29,14 +29,12 @@
 
     body,
     #page-container {
-        height: 300vh;
+        height: 400vh;
         margin: 0;
         padding: 0;
     }
 
     main {
-        width: 100%;
-        height: 100vh;
         max-height: 100vh;
         background: rgba(0, 0, 0, 0.0);
         transition: background 1s;
@@ -44,6 +42,20 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .section {
+        width: 100%;
+        height: 100vh;
+    }
+
+    #game-portfolio-section {
+        height: 200vh;
+        background: rgba(255, 255, 150, 0.2);
+    }
+
+    #web-section {
+        height: 200vh;
     }
 
     #opening-container {
@@ -114,8 +126,8 @@
 
 <body>
     <div id="page-container">
-        <main>
-            <div id="opening-container">
+        <main class="section">
+            <div id="opening-container" class="">
                 <div id="lol-logo">
                     Gummy
                     <br />Duck
@@ -133,86 +145,21 @@
                         <a href="#">Work with us.</a>
                     </p>
                 </div>
-                <video style="height: 0; width: 0;" src="/vastlevel5vid.webm" loop></video>
-            </div>
-            <div id="">
 
             </div>
         </main>
+        <section class="section" id="game-portfolio-section">
+            <video style="height: 0; width: 0;" src="/vastlevel5vid.webm" loop></video>
+        </section>
+        <section class="section" id="web-section">
+        </section>
     </div>
     <script defer src="/node_modules/three/build/three.js"></script>
+    <script defer src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/2666677/MyShaderChunks.js"></script>
     <script defer src="/node_modules/three/examples/js/loaders/GLTFLoader.js"></script>
     <script defer src="/node_modules/oimo/build/oimo.js"></script>
+    
     <script defer src="/script.js"></script>
-    <script>
-
-        const sel = document.querySelector.bind(document);
-
-        const configureStart = () => {
-            window.onbeforeunload = () => {
-                window.scrollTo(0, 0);
-            };
-            manageFontSizes();
-        };
-
-
-        const manageFontSizes = (container) => {
-            const htmlE = document.querySelector("html");
-            const setSizeWithWindow = () => {
-                let computedFontSize = (((window.innerHeight / window.devicePixelRatio) / 1080) * 12) + 8;
-                computedFontSize += ((window.innerWidth / window.devicePixelRatio) / 1920) * 4;
-                htmlE.style.fontSize = (THREE.MathUtils.clamp(computedFontSize, 12, 28)) + "px";
-            };
-            setSizeWithWindow();
-            window.addEventListener("resize", () => {
-                setSizeWithWindow();
-            });
-        };
-
-        document.addEventListener("DOMContentLoaded", () => {
-
-            const main = sel("main");
-            const logo = sel("#lol-logo");
-            const details = sel("#opening-details");
-
-            const mainHeight = main.clientHeight;
-
-            configureStart();
-
-            document.addEventListener("click", () => {
-                document.querySelector("video").play();
-            });
-
-            window.addEventListener("scroll", () => {
-                const scrolledFromTop = window.scrollY;
-                if (window.GROW_PANE) {
-                    window.GROW_PANE(Math.min(1, window.scrollY / mainHeight));
-                }
-            });
-
-            const k = "saidawaygoestroubledownthedrain";
-            const beenHereBefore = localStorage.getItem(k);
-            if (!beenHereBefore) {
-                localStorage.setItem(k, " ");
-                setTimeout(() => {
-                    logo.style.opacity = 0.8;
-                }, 1000);
-
-                setTimeout(() => {
-                    logo.style.color = "rgb(255, 255, 130)";
-                    main.style.background = "rgba(0, 0, 0, 0.95)";
-                    details.style.opacity = 1;
-                }, 5000);
-            } else {
-                logo.style.opacity = 0.8;
-                logo.style.color = "rgb(255, 255, 130)";
-                main.style.background = "rgba(0, 0, 0, 0.95)";
-                details.style.opacity = 1;
-            }
-
-
-        });
-    </script>
 </body>
 
 </html>
