@@ -23,6 +23,10 @@
         font-weight: bold;
     }
 
+    * {
+        box-sizing: border-box;
+    }
+
     html {
         font-size: 24px;
     }
@@ -47,15 +51,22 @@
     .section {
         width: 100%;
         height: 100vh;
+        padding-top: 1px;
     }
 
     #game-portfolio-section {
         height: 200vh;
-        background: rgba(255, 255, 150, 0.2);
+        background: rgba(255, 255, 150, 0.0);
     }
 
     #web-section {
         height: 200vh;
+        background: rgba(200, 0, 200, 0.1);
+    }
+
+    #room-section {
+        height: 300vh;
+        background: rgba(255, 255, 255, 0);
     }
 
     #opening-container {
@@ -122,6 +133,33 @@
         left: 0;
         z-index: -2
     }
+
+    #game-portfolio-section {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .content-box {
+        background: rgba(200, 200, 100, 0.95);
+        border: 1px solid white;
+        border-radius: 1rem;
+        font-family: "Sinkin";
+        font-size: 1rem;
+        padding: 1rem;
+        color: rgb(10, 10, 0);
+    }
+
+    #vast-blurb {
+        margin: 0 auto;
+        margin-top: 75vh;
+        width: 50vw;
+    }
+
+    #web-services-blurb {
+        margin-left: 10vw;
+        margin-top: 75vh;
+        width: 40vw;
+    }
+
 </style>
 
 <body>
@@ -150,15 +188,32 @@
         </main>
         <section class="section" id="game-portfolio-section">
             <video style="height: 0; width: 0;" src="/vastlevel5vid.webm" loop></video>
+            <div class="content-box" id="vast-blurb">
+                <h1>vast</h1>
+                <p>A game about writing Javascript.</p>
+            </div>
         </section>
         <section class="section" id="web-section">
+            <div class="content-box" id="web-services-blurb">
+                <h1>First class web services</h1>
+                <p>Back-end? Front-end? It don't matta.</p>
+            </div>
+        </section>
+        <section class="section" id="room-section">
+            
         </section>
     </div>
     <script defer src="/node_modules/three/build/three.js"></script>
     <script defer src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/2666677/MyShaderChunks.js"></script>
     <script defer src="/node_modules/three/examples/js/loaders/GLTFLoader.js"></script>
+    <script defer src="/node_modules/three/examples/js/postprocessing/Pass.js"></script>
+    <script defer src="/node_modules/three/examples/js/shaders/CopyShader.js"></script>
+    <script defer src="/node_modules/three/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script defer src="/node_modules/three/examples/js/postprocessing/ShaderPass.js"></script>
+    <script defer src="/node_modules/three/examples/js/postprocessing/EffectComposer.js"></script>
+    <script defer src="/node_modules/three/examples/js/postprocessing/RenderPass.js"></script>
+    <script defer src="/node_modules/three/examples/js/postprocessing/UnrealBloomPass.js"></script>
     <script defer src="/node_modules/oimo/build/oimo.js"></script>
-    
     <script defer src="/script.js"></script>
 </body>
 

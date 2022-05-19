@@ -40,10 +40,11 @@ const screenResolutionNormal = () => {
     return new THREE.Vector2(window.innerWidth, window.innerHeight);
 };
 
-const setViewport = (renderer, uniforms) => {
+const setViewport = (renderer, composer, uniforms) => {
     const width = (window.innerWidth);
     const height = (window.innerHeight);
     renderer.setSize(width, height);
+    composer.setSize(width, height);
     uniforms.forEach(u => u.u_Resolution.value = new THREE.Vector2(width, height));
 };
 
@@ -106,18 +107,6 @@ const sel = document.querySelector.bind(document);
 
 const gamePortfElement = sel("#game-portfolio-section");
 const webSection = sel("#web-section");
-
-const activateSecondSectionDOM = () => {
-    gamePortfElement.style.position = "fixed";
-    gamePortfElement.style.top = 0;
-    gamePortfElement.style.left = 0;
-    webSection.style.marginTop = "300vh";
-};
-
-const deactivateSecondSectionDOM = () => {
-    gamePortfElement.style.position = "static";
-    webSection.style.marginTop = 0;
-};
 
 (async () => {
 
@@ -183,6 +172,9 @@ const deactivateSecondSectionDOM = () => {
             if (window.SHOW_THIRD) {
                 window.SHOW_THIRD(window.scrollY);
             }
+            if (window.SHOW_FOURTH) {
+                window.SHOW_FOURTH(window.scrollY);
+            }
         });
 
         playOpening();
@@ -195,6 +187,12 @@ const deactivateSecondSectionDOM = () => {
 
     const scene = new THREE.Scene();
 
+    const screenMousePos = new THREE.Vector2(0, 0);
+    document.addEventListener("mousemove", (e) => {
+        screenMousePos.x = e.clientX;
+        screenMousePos.y = e.clientY;
+    });
+
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 25;
 
@@ -203,7 +201,18 @@ const deactivateSecondSectionDOM = () => {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setClearColor(0xFCE77D);
-    renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+    renderer.setPixelRatio(window.devicePixelRatio || 1);
+
+    const composer = new THREE.EffectComposer(renderer);
+    const renderPass = new THREE.RenderPass(scene, camera);
+
+    const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1, -10, 0.65);
+    bloomPass.enabled = false;
+    bloomPass.renderToScreen = true;
+
+    composer.addPass(renderPass);
+    composer.addPass(bloomPass);
+
     document.querySelector("#page-container").appendChild(renderer.domElement);
 
     const world = new OIMO.World({
@@ -281,63 +290,68 @@ const deactivateSecondSectionDOM = () => {
     blackPlane.position.z = 20;
     scene.add(blackPlane);
 
-    window.GROW_PANE = (portionOfScale) => {
-
-        if (thirdSceneActive) return;
-
-        const SCALE = 18 * portionOfScale;
-
-        if (portionOfScale < 1) {
-            world.play();
-            tearDownSecondSection();
-            deactivateSecondSectionDOM();
-        } else {
-            if (secondSceneActive) return;
-            ducks.forEach((aDuck) => {
-                const z = aDuck.physicsRep.position.z;
-                if (z > 18) {
-                    scene.remove(aDuck.mesh);
-                }
-            });
-            activateSecondSectionDOM();
-            setTimeout(() => {
-                world.stop();
-                triggerSecondSection();
-            }, 100);
-        }
-
-        if (portionOfScale < 0.5) {
-            blackPlane.scale.set(SCALE / 20, SCALE * 2, 0);
-        } else {
-            blackPlane.scale.set(SCALE / (40 - (39 * portionOfScale)), SCALE, 0);
-        }
-    };
-
-    const webSectionOffset = webSection.offsetTop;
-
-    window.SHOW_THIRD = (scrollY) => {
-        if (scrollY >= webSectionOffset) {
-            if (thirdSceneActive === true) return;
-            thirdSceneActive = true;
-            triggerThirdSection();
-            deactivateSecondSectionDOM();
-            tearDownSecondSection();
-        } else {
-            tearDownThirdSection();
-        }
-    };
-
-
+    let firstSceneActive = true;
     let secondSceneActive = false;
     let thirdSceneActive = false;
-    let secondSceneDestroyFn = null;
-    let thirdSceneDestroyFn = null;
-    const triggerSecondSection = () => {
-        if (!secondSceneActive) {
-            secondSceneActive = true;
-        } else {
-            return;
+
+    window.GROW_PANE = (portionOfScale) => {
+        if (firstSceneActive || secondSceneActive) {
+            const SCALE = 18 * portionOfScale;
+
+            if (portionOfScale < 1) {
+                world.play();
+                firstSceneActive = true;
+                tearDownSecondSection();
+                secondSceneActive = false;
+            } else {
+                if (secondSceneActive) return;
+                firstSceneActive = false;
+                ducks.forEach((aDuck) => {
+                    const z = aDuck.physicsRep.position.z;
+                    if (z > 18) {
+                        scene.remove(aDuck.mesh);
+                    }
+                });
+                world.stop();
+                firstSceneActive = false;
+                triggerSecondSection();
+                secondSceneActive = true;
+            }
+
+            if (portionOfScale < 0.5) {
+                blackPlane.scale.set(SCALE / 20, SCALE * 2, 0);
+            } else {
+                blackPlane.scale.set(SCALE / (40 - (39 * portionOfScale)), SCALE, 0);
+            }
         }
+    };
+
+
+    window.SHOW_THIRD = (scrollY) => {
+        if (secondSceneActive || thirdSceneActive) {
+            const webSectionOffset = webSection.offsetTop;
+            if (scrollY >= webSectionOffset) {
+                if (thirdSceneActive === true) return;
+                tearDownSecondSection();
+                secondSceneActive = false;
+                triggerThirdSection();
+                thirdSceneActive = true;
+            } else {
+                if (secondSceneActive === true) return;
+                tearDownThirdSection();
+                thirdSceneActive = false;
+                triggerSecondSection();
+                secondSceneActive = true;
+            }
+        }
+    };
+
+    window.SHOW_FOURTH = (scrollY) => {
+
+    };
+
+    let secondSceneDestroyFn = null;
+    const triggerSecondSection = () => {
 
         const fullGroup = new THREE.Group();
         const platGroup = new THREE.Group();
@@ -387,26 +401,26 @@ const deactivateSecondSectionDOM = () => {
     };
 
     const tearDownSecondSection = () => {
-        if (secondSceneActive) {
-            secondSceneActive = false;
-            secondSceneDestroyFn && secondSceneDestroyFn();
-        }
+        secondSceneDestroyFn && secondSceneDestroyFn();
     };
 
+    let thirdSceneDestroyFn = null;
     const triggerThirdSection = () => {
 
         const group = new THREE.Group();
         const ducky = originalDuck.clone();
 
-        ducky.scale.x = 0.01;
-        ducky.scale.y = 0.01;
-        ducky.scale.z = 0.01;
+        bloomPass.enabled = true;
 
-        ducky.position.x = -1;
-        ducky.position.y = -0.8;
+        ducky.scale.x = 0.012;
+        ducky.scale.y = 0.012;
+        ducky.scale.z = 0.012;
+
+        ducky.position.x = -0.2;
+        ducky.position.y = -1;
 
         const duckUniforms = {
-            u_mouse_x: { value: 0.0 },
+            u_mouse_x: { value: Math.abs(screenMousePos.x - (window.innerWidth / 2)) },
             u_time: { value: 0.0 },
             u_tex: { value: new THREE.TextureLoader().load("https://s3-us-west-2.amazonaws.com/s.cdpn.io/2666677/explosion.png") }
         };
@@ -423,7 +437,7 @@ const deactivateSecondSectionDOM = () => {
                 
                 void main() {	
                     v_noise = 15.0 * -0.1 * turbulence(0.5 * normal + (u_time / 10000.0) * 1.4);
-                    float b = ((u_mouse_x - 200.0) / 100.0) * pnoise(0.05 * position, vec3(100.0));
+                    float b = ((u_mouse_x) / 30.0) * pnoise(0.05 * position, vec3(100.0));
                     float displacement = b - 10.0 * v_noise;
                     vec3 pos = position + normal * displacement;
                     gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
@@ -463,40 +477,33 @@ const deactivateSecondSectionDOM = () => {
         const rotating = setInterval(() => {
             duckUniforms.u_time.value += 12.0;
             ducky.rotateOnAxis(yAxis, Math.PI / 1024);
+            duckUniforms.u_mouse_x.value = Math.abs(screenMousePos.x - (window.innerWidth / 2));
+            // bloomPass.strength = screenMousePos
         }, 10);
 
-        const setMouseX = (e) => {
-            duckUniforms.u_mouse_x.value = e.screenX;
-        };
-
-        document.addEventListener("mousemove", setMouseX);
-
         thirdSceneDestroyFn = () => {
+            bloomPass.enabled = false;
             scene.remove(group);
             clearInterval(rotating);
-            document.removeEventListener("mousemove", setMouseX);
         };
     };
 
     const tearDownThirdSection = () => {
-        if (thirdSceneActive) {
-            thirdSceneActive = false;
-            thirdSceneDestroyFn && thirdSceneDestroyFn();
-        }
+        thirdSceneDestroyFn && thirdSceneDestroyFn();
     };
 
     ground.connectMesh(groundMesh);
 
     world.play();
 
-    const loop = function () {
-        renderer.render(scene, camera);
+    const loop = function (dt) {
+        composer.render();
         requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
 
-    setViewport(renderer, ducks.map(d => d.uniforms));
-    window.addEventListener("resize", myDebounce(() => setViewport(renderer, ducks.map(d => d.uniforms)), 70));
+    setViewport(renderer, composer, ducks.map(d => d.uniforms));
+    window.addEventListener("resize", myDebounce(() => setViewport(renderer, composer, ducks.map(d => d.uniforms)), 70));
 
     window.GROW_PANE(0);
 
