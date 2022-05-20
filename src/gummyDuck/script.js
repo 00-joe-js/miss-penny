@@ -107,6 +107,7 @@ const sel = document.querySelector.bind(document);
 
 const gamePortfElement = sel("#game-portfolio-section");
 const webSection = sel("#web-section");
+const roomSection = sel("#room-section");
 
 (async () => {
 
@@ -146,7 +147,7 @@ const webSection = sel("#web-section");
         }
     };
 
-    const manageFontSizes = (container) => {
+    const manageFontSizes = () => {
         const htmlE = document.querySelector("html");
         const setSizeWithWindow = () => {
             let computedFontSize = (((window.innerHeight / window.devicePixelRatio) / 1080) * 12) + 8;
@@ -206,7 +207,7 @@ const webSection = sel("#web-section");
     const composer = new THREE.EffectComposer(renderer);
     const renderPass = new THREE.RenderPass(scene, camera);
 
-    const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1, -10, 0.65);
+    const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1, -2.5, 0.65);
     bloomPass.enabled = false;
     bloomPass.renderToScreen = true;
 
@@ -293,6 +294,7 @@ const webSection = sel("#web-section");
     let firstSceneActive = true;
     let secondSceneActive = false;
     let thirdSceneActive = false;
+    let fourthSceneActive = false;
 
     window.GROW_PANE = (portionOfScale) => {
         if (firstSceneActive || secondSceneActive) {
@@ -340,14 +342,23 @@ const webSection = sel("#web-section");
                 if (secondSceneActive === true) return;
                 tearDownThirdSection();
                 thirdSceneActive = false;
-                triggerSecondSection();
+                triggerFourthSection();
                 secondSceneActive = true;
             }
         }
     };
 
     window.SHOW_FOURTH = (scrollY) => {
-
+        if (thirdSceneActive || fourthSceneActive) {
+            const roomSectionOffset = webSection.offsetTop;
+            if (scrollY >= webSectionOffset) {
+                if (fourthSceneActive === true) return;
+                tearDownThirdSection();
+                thirdSceneActive = false;
+                triggerThirdSection();
+                thirdSceneActive = true;
+            }
+        }
     };
 
     let secondSceneDestroyFn = null;
