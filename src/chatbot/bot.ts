@@ -36,11 +36,17 @@ const commands: { [k: string]: (opts: SmashRandomOptions, userState: ChatUsersta
     "!arena": () => {
         pennySay(shareArena());
     },
-    "!joesWorkingOn": () => {
+    "!wheresJoe": () => {
         pennySay(joesWorkingOn());
     },
     "!links": () => {
         pennySay(`Hi~ :::: https://joejs.live ::: https://github.com/00-joe-js`);
+    },
+    "!jam": () => {
+        pennySay(`Together Jam 2022. First prize: $25,000 oowoo https://gamejolt.com/p/together-jam-is-starting-on-june-17th-july-3rd-2022-broug-mmpgfiax`);
+    },
+    "!techStack": () => {
+        pennySay(`This is a web game so JavaScript for browser and Three. I use the DOM for game interface so React may get included depending. Feel free to ask me questions about what I'm working on!`);
     },
     "!pennyDrop": () => {
         pennyDrop();
@@ -88,7 +94,6 @@ const parseMessageToCommandRunner = (messageText: string, userState: ChatUsersta
         return commands[firstPart].bind(null, { ...defaultOptions, ...parameters }, userState);
     }
 };
-
 const handleMessage = async (channel: string, userState: ChatUserstate, message: string, self: boolean) => {
     if (channel !== channels[0]) return; // Defense
     if (self === true) return; // Do not handle messages sent from the bot.
@@ -109,7 +114,6 @@ const twitchChatBotClient = new Client({
     },
     channels
 });
-
 twitchChatBotClient.on("connected", () => {
     twitchChatBotClient.on("message", handleMessage);
 });
